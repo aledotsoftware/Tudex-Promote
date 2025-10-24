@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CreativeController;
 use App\Http\Controllers\SiteController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +14,10 @@ Route::get('/dashboard', function () {
         return redirect()->route('sites.index');
     }
 
+    if (auth()->user()->role === 'advertiser') {
+        return redirect()->route('creatives.index');
+    }
+
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
@@ -22,6 +27,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::resource('sites', SiteController::class)->middleware('role:publisher');
+    Route::get('sites/{site}/verify', [SiteController::class, 'verify'])->name('sites.verify')->middleware('role:publisher');
+
+    Route::resource('creatives', CreativeController::class)->middleware('role:advertiser');
 });
 
 require __DIR__.'/auth.php';
