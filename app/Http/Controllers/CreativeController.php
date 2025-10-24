@@ -24,8 +24,12 @@ class CreativeController extends Controller
      */
     public function create()
     {
-        // We need to pass the user's campaigns to the view to associate the creative with one.
         $campaigns = auth()->user()->campaigns;
+
+        if ($campaigns->isEmpty()) {
+            return redirect()->route('campaigns.create')->with('info', 'You need to create a campaign before adding creatives.');
+        }
+
         return view('creatives.create', compact('campaigns'));
     }
 
