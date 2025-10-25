@@ -45,7 +45,7 @@
                         <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">{{ __('Your Sites') }}</h3>
                         <div class="mt-2 space-y-4">
                             @forelse ($sites as $site)
-                                <div x-data="{ open: false }" class="p-4 bg-gray-100 dark:bg-gray-900 rounded-lg">
+                                <a href="{{ route('sites.show', $site) }}" class="block p-4 bg-gray-100 dark:bg-gray-900 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
                                     <div class="flex items-center justify-between">
                                         <div>
                                             <p class="text-gray-800 dark:text-gray-200 font-semibold">{{ $site->domain }}</p>
@@ -67,16 +67,19 @@
                                     <div x-show="open" class="mt-4 p-4 bg-gray-200 dark:bg-gray-700 rounded-lg">
                                         <h4 class="font-semibold">{{ __('Verification Instructions') }}</h4>
                                         <p class="mt-2">{{ __('Choose one of the following methods to verify your domain:') }}</p>
+                                        @php
+                                            $cleanDomain = str_replace(['http://', 'https://'], '', $site->domain);
+                                        @endphp
                                         <div class="mt-4">
                                             <h5 class="font-semibold">{{ __('Method 1: DNS TXT Record') }}</h5>
                                             <p>{{ __("Add a TXT record to your domain's DNS settings with the following values:") }}</p>
                                             <div class="mt-2 p-2 bg-gray-100 dark:bg-gray-800 rounded">
-                                                <code class="text-sm">adverify.yourdomain.com IN TXT "{{ $site->verification_token }}"</code>
+                                                <code class="text-sm">adverify.{{ $cleanDomain }} IN TXT "{{ $site->verification_token }}"</code>
                                             </div>
                                         </div>
                                         <div class="mt-4">
                                             <h5 class="font-semibold">{{ __('Method 2: ads.txt File') }}</h5>
-                                            <p>{{ __('Add the following line to the `ads.txt` file at the root of your domain (e.g., `https://' . $site->domain . '/ads.txt`):') }}</p>
+                                            <p>{{ __('Add the following line to the `ads.txt` file at the root of your domain (e.g., `https://' . $cleanDomain . '/ads.txt`):') }}</p>
                                             <div class="mt-2 p-2 bg-gray-100 dark:bg-gray-800 rounded">
                                                 <code class="text-sm">your-ad-network.com, {{ $site->verification_token }}, DIRECT</code>
                                             </div>

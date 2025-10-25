@@ -62,5 +62,15 @@ class CreativeController extends Controller
         return redirect()->route('creatives.index')->with('success', 'Creative added successfully.');
     }
 
+    /**
+     * Display the specified resource.
+     */
+    public function show(Creative $creative)
+    {
+        $this->authorize('view', $creative);
+
+        return view('creatives.show', compact('creative'));
+    }
+
     // ... other methods are empty for now
 }

@@ -26,4 +26,9 @@ class Site extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function adZones()
+    {
+        return $this->hasMany(AdZone::class);
+    }
 }

@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Campaign;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 
 class CampaignController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
      */
@@ -40,6 +43,16 @@ class CampaignController extends Controller
         auth()->user()->campaigns()->create($request->all());
 
         return redirect()->route('campaigns.index')->with('success', 'Campaign created successfully.');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Campaign $campaign)
+    {
+        $this->authorize('view', $campaign);
+
+        return view('campaigns.show', compact('campaign'));
     }
 
     // ... other methods are empty for now

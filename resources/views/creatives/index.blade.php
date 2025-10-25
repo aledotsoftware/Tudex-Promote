@@ -17,12 +17,12 @@
 
                     <div class="mt-2 space-y-4">
                         @forelse ($creatives as $creative)
-                            <div class="p-4 bg-gray-100 dark:bg-gray-900 rounded-lg">
+                            <a href="{{ route('creatives.show', $creative) }}" class="block p-4 bg-gray-100 dark:bg-gray-900 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
                                 <p class="text-gray-800 dark:text-gray-200">{{ $creative->file_url }}</p>
                                 <p class="text-sm text-gray-600 dark:text-gray-400">
                                     {{ $creative->type }} - {{ $creative->width }}x{{ $creative->height }}
                                 </p>
-                            </div>
+                            </a>
                         @empty
                             <p>{{ __("You haven't added any creatives yet.") }}</p>
                         @endforelse

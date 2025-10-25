@@ -28,6 +28,20 @@ class SiteController extends Controller
         //
     }
 
+    public function show(Site $site)
+    {
+        $this->authorize('view', $site);
+
+        return view('sites.show', compact('site'));
+    }
+
+    public function tag(\App\Models\AdZone $adZone)
+    {
+        $this->authorize('view', $adZone->site);
+
+        return view('sites.tag', compact('adZone'));
+    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -45,13 +59,6 @@ class SiteController extends Controller
         return redirect()->route('sites.index');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Site $site)
-    {
-        //
-    }
 
     /**
      * Show the form for editing the specified resource.

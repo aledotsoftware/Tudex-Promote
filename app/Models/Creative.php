@@ -22,4 +22,9 @@ class Creative extends Model
         'height',
         'type',
     ];
+
+    public function campaign()
+    {
+        return $this->belongsTo(Campaign::class);
+    }
 }

@@ -12,9 +12,18 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
+                    @if (Auth::user()->role === 'publisher')
+                        <x-nav-link :href="route('sites.index')" :active="request()->routeIs('sites.index')">
+                            {{ __('My Sites') }}
+                        </x-nav-link>
+                    @elseif (Auth::user()->role === 'advertiser')
+                        <x-nav-link :href="route('campaigns.index')" :active="request()->routeIs('campaigns.index')">
+                            {{ __('Campaigns') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('creatives.index')" :active="request()->routeIs('creatives.index')">
+                            {{ __('Creatives') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -67,9 +76,18 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
-            </x-responsive-nav-link>
+            @if (Auth::user()->role === 'publisher')
+                <x-responsive-nav-link :href="route('sites.index')" :active="request()->routeIs('sites.index')">
+                    {{ __('My Sites') }}
+                </x-responsive-nav-link>
+            @elseif (Auth::user()->role === 'advertiser')
+                <x-responsive-nav-link :href="route('campaigns.index')" :active="request()->routeIs('campaigns.index')">
+                    {{ __('Campaigns') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('creatives.index')" :active="request()->routeIs('creatives.index')">
+                    {{ __('Creatives') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->
