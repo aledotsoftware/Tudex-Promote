@@ -74,4 +74,11 @@ class AdZoneController extends Controller
     {
         //
     }
+
+    public function tag(AdZone $adZone)
+    {
+        $this->authorize('view', $adZone->site);
+
+        return view('adzones.tag', compact('adZone'));
+    }
 }

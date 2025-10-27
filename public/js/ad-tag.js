@@ -1,27 +1,27 @@
 (function() {
-    const scriptTag = document.currentScript;
-    const params = new URLSearchParams(scriptTag.src.split('?')[1]);
-    const zoneId = params.get('zone_id');
-    const adContainer = document.getElementById(`ad-zone-${zoneId}`);
+    document.addEventListener('DOMContentLoaded', function() {
+        const adZones = document.querySelectorAll('.ad-zone');
+        adZones.forEach(adZone => {
+            const adZoneId = adZone.id.split('-')[2];
+            const width = adZone.dataset.width;
+            const height = adZone.dataset.height;
 
-    if (adContainer) {
-        // We'll need an API endpoint to serve the ad content.
-        // For now, this is just a placeholder.
-        const apiUrl = `/api/serve-ad?zone_id=${zoneId}`;
+            fetch(`/api/ad-request/${adZoneId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.html_content) {
+                        const iframe = document.createElement('iframe');
+                        iframe.width = width;
+                        iframe.height = height;
+                        iframe.style.border = 'none';
+                        iframe.srcdoc = data.html_content;
+                        adZone.appendChild(iframe);
 
-        fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                if (data.html) {
-                    const iframe = document.createElement('iframe');
-                    iframe.srcdoc = data.html;
-                    iframe.width = data.width;
-                    iframe.height = data.height;
-                    iframe.style.border = 'none';
-                    iframe.scrolling = 'no';
-                    adContainer.appendChild(iframe);
-                }
-            })
-            .catch(error => console.error('Error fetching ad:', error));
-    }
+                        // Record an impression
+                        fetch(`/api/impression/${data.placement_id}`, { method: 'POST' });
+                    }
+                })
+                .catch(error => console.error('Error fetching ad:', error));
+        });
+    });
 })();

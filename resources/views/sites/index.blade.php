@@ -50,10 +50,18 @@
                                         <div>
                                             <p class="text-gray-800 dark:text-gray-200 font-semibold">{{ $site->domain }}</p>
                                             <p class="text-sm text-gray-600 dark:text-gray-400">
-                                                @if ($site->verified)
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">{{ __('Verified') }}</span>
+                                                @if ($site->verified && $site->verification_expires_at > now())
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                        {{ __('Verified until') }} {{ $site->verification_expires_at->format('M d, Y') }}
+                                                    </span>
+                                                @elseif ($site->verified && $site->verification_expires_at <= now())
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                        {{ __('Verification Expired') }}
+                                                    </span>
                                                 @else
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">{{ __('Not Verified') }}</span>
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                        {{ __('Not Verified') }}
+                                                    </span>
                                                 @endif
                                             </p>
                                         </div>

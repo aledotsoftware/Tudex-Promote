@@ -36,11 +36,12 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('sites', SiteController::class)->middleware('role:publisher');
     Route::get('sites/{site}/verify', [SiteController::class, 'verify'])->name('sites.verify')->middleware('role:publisher');
-    Route::get('sites/{adZone}/tag', [SiteController::class, 'tag'])->name('sites.tag')->middleware('role:publisher');
 
     Route::resource('creatives', CreativeController::class)->middleware('role:advertiser');
     Route::resource('campaigns', CampaignController::class)->middleware('role:advertiser');
-    Route::resource('ad-zones', AdZoneController::class)->middleware('role:publisher');
+    Route::get('campaigns/{campaign}/stats', [CampaignController::class, 'stats'])->name('campaigns.stats')->middleware('role:advertiser');
+    Route::resource('adzones', AdZoneController::class)->middleware('role:publisher');
+    Route::get('adzones/{adzone}/tag', [AdZoneController::class, 'tag'])->name('adzones.tag')->middleware('role:publisher');
 });
 
 require __DIR__.'/auth.php';

@@ -40,15 +40,23 @@ class CreativeController extends Controller
     {
         $request->validate([
             'campaign_id' => ['required', 'exists:campaigns,id'],
-            'html_content' => ['required', 'string'],
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string', 'max:255'],
             'click_url' => ['required', 'url'],
             'width' => ['required', 'integer', 'min:1'],
             'height' => ['required', 'integer', 'min:1'],
         ]);
 
+        // Generate HTML content from title and description
+        $htmlContent = view('creatives.templates.default', [
+            'title' => $request->title,
+            'description' => $request->description,
+            'click_url' => $request->click_url,
+        ])->render();
+
         // We'll store the HTML content in a file and save the path.
         $path = 'creatives/' . uniqid() . '.html';
-        \Illuminate\Support\Facades\Storage::disk('public')->put($path, $request->html_content);
+        \Illuminate\Support\Facades\Storage::disk('public')->put($path, $htmlContent);
 
         Creative::create([
             'campaign_id' => $request->campaign_id,
