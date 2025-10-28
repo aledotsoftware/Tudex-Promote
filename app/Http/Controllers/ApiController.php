@@ -49,11 +49,14 @@ class ApiController extends Controller
         ]);
     }
 
-    public function impression(Placement $placement)
+    public function impression(Request $request, Placement $placement)
     {
         AdImpression::create([
             'placement_id' => $placement->id,
             'impression_time' => now(),
+            'page_url' => $request->input('page_url'),
+            'user_agent' => $request->userAgent(),
+            'metadata' => $request->except(['page_url']),
         ]);
 
         return response()->json(['success' => true]);

@@ -13,8 +13,14 @@
                     <p class="mt-2">{{ __('Copy and paste this code into your website where you want the ad to appear.') }}</p>
 
                     <div class="mt-4">
-                        <textarea class="w-full h-48 p-2 border border-gray-300 rounded-md" readonly><div id="ad-zone-{{ $adZone->id }}" class="ad-zone" data-width="{{ $adZone->width }}" data-height="{{ $adZone->height }}"></div>
-<script src="{{ asset('js/ad-tag.js') }}"></script></textarea>
+<textarea class="w-full h-48 p-2 border border-gray-300 rounded-md" readonly><!-- Ad Server Tag -->
+<div class="ad-server-placeholder"
+     data-adzone-id="{{ $adZone->id }}"
+     style="width: {{ $adZone->width }}px; height: {{ $adZone->height }}px;">
+</div>
+<script src="{{ asset('js/ad-tag.js') }}" async defer></script>
+<!-- End Ad Server Tag -->
+</textarea>
                     </div>
                 </div>
             </div>
