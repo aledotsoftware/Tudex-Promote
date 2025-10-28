@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Creative;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 
 class CreativeController extends Controller
 {
+    use AuthorizesRequests;
     /**
      * Display a listing of the resource.
      */

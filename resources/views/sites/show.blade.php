@@ -10,7 +10,7 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 dark:text-gray-100">
                     <div class="mb-4">
-                        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">{{ __('Add a new ad zone') }}</h3>
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100" data-testid="add-ad-zone-heading">{{ __('Add a new ad zone') }}</h3>
                         <form method="POST" action="{{ route('adzones.store') }}" class="mt-2">
                             @csrf
                             <input type="hidden" name="site_id" value="{{ $site->id }}">

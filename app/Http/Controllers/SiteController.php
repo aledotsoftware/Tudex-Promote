@@ -97,7 +97,7 @@ class SiteController extends Controller
                         'verified' => true,
                         'verification_expires_at' => now()->addYear(),
                     ]);
-                    return redirect()->route('sites.index')->with('success', 'Site verified successfully using DNS.');
+                    return redirect()->route('sites.show', $site)->with('success', 'Site verified successfully! Now you can create Ad Zones to get your ad tag.');
                 }
             }
         } catch (\Exception $e) {
@@ -112,7 +112,7 @@ class SiteController extends Controller
                     'verified' => true,
                     'verification_expires_at' => now()->addYear(),
                 ]);
-                return redirect()->route('sites.index')->with('success', 'Site verified successfully using ads.txt.');
+                return redirect()->route('sites.show', $site)->with('success', 'Site verified successfully! Now you can create Ad Zones to get your ad tag.');
             }
         } catch (\Exception $e) {
             // File could not be fetched
