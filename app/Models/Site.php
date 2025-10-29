@@ -17,6 +17,8 @@ class Site extends Model
     protected $fillable = [
         'domain',
         'verification_token',
+        'verified',
+        'verification_expires_at',
     ];
 
     /**
@@ -31,4 +33,13 @@ class Site extends Model
     {
         return $this->hasMany(AdZone::class);
     }
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'verification_expires_at' => 'datetime',
+    ];
 }

@@ -50,14 +50,26 @@
                                         <div>
                                             <p class="text-gray-800 dark:text-gray-200 font-semibold">{{ $site->domain }}</p>
                                             <p class="text-sm text-gray-600 dark:text-gray-400">
-                                                @if ($site->verified)
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">{{ __('Verified') }}</span>
+                                                @if ($site->verified && $site->verification_expires_at > now())
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                        {{ __('Verified until') }} {{ $site->verification_expires_at->format('M d, Y') }}
+                                                    </span>
+                                                @elseif ($site->verified && $site->verification_expires_at <= now())
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                        {{ __('Verification Expired') }}
+                                                    </span>
                                                 @else
-                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">{{ __('Not Verified') }}</span>
+                                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                        {{ __('Not Verified') }}
+                                                    </span>
                                                 @endif
                                             </p>
                                         </div>
-                                        @if (!$site->verified)
+                                        @if ($site->verified && $site->verification_expires_at > now())
+                                            <div>
+                                                <a href="{{ route('sites.show', $site) }}" class="text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Manage Ad Zones / Get Code') }}</a>
+                                            </div>
+                                        @else
                                             <div>
                                                 <button @click="open = !open" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Show Instructions') }}</button>
                                                 <a href="{{ route('sites.verify', $site) }}" class="ms-4 inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 active:bg-indigo-700 focus:outline-none focus:border-indigo-700 focus:ring ring-indigo-300 disabled:opacity-25 transition ease-in-out duration-150">{{ __('Verify Now') }}</a>

@@ -93,8 +93,11 @@ class SiteController extends Controller
             $records = dns_get_record('adverify.' . $site->domain, DNS_TXT);
             foreach ($records as $record) {
                 if (isset($record['txt']) && $record['txt'] === $site->verification_token) {
-                    $site->update(['verified' => true]);
-                    return redirect()->route('sites.index')->with('success', 'Site verified successfully using DNS.');
+                    $site->update([
+                        'verified' => true,
+                        'verification_expires_at' => now()->addYear(),
+                    ]);
+                    return redirect()->route('sites.show', $site)->with('success', 'Site verified successfully! Now you can create Ad Zones to get your ad tag.');
                 }
             }
         } catch (\Exception $e) {
@@ -105,8 +108,11 @@ class SiteController extends Controller
         try {
             $adsTxtContent = file_get_contents('https://' . $site->domain . '/ads.txt');
             if (str_contains($adsTxtContent, $site->verification_token)) {
-                $site->update(['verified' => true]);
-                return redirect()->route('sites.index')->with('success', 'Site verified successfully using ads.txt.');
+                $site->update([
+                    'verified' => true,
+                    'verification_expires_at' => now()->addYear(),
+                ]);
+                return redirect()->route('sites.show', $site)->with('success', 'Site verified successfully! Now you can create Ad Zones to get your ad tag.');
             }
         } catch (\Exception $e) {
             // File could not be fetched

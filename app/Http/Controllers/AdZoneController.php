@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\AdZone;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 
 class AdZoneController extends Controller
 {
+    use AuthorizesRequests;
     /**
      * Display a listing of the resource.
      */
@@ -73,5 +75,12 @@ class AdZoneController extends Controller
     public function destroy(AdZone $adZone)
     {
         //
+    }
+
+    public function tag(AdZone $adZone)
+    {
+        $this->authorize('view', $adZone->site);
+
+        return view('adzones.tag', compact('adZone'));
     }
 }

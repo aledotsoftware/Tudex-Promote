@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AdClick;
+use App\Models\AdImpression;
 use App\Models\Campaign;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
@@ -53,6 +55,29 @@ class CampaignController extends Controller
         $this->authorize('view', $campaign);
 
         return view('campaigns.show', compact('campaign'));
+    }
+
+    public function stats(Campaign $campaign)
+    {
+        $this->authorize('view', $campaign);
+
+        $impressions = AdImpression::whereHas('placement.creative', function ($query) use ($campaign) {
+            $query->where('campaign_id', $campaign->id);
+        })->count();
+
+        $clicks = AdClick::whereHas('placement.creative', function ($query) use ($campaign) {
+            $query->where('campaign_id', $campaign->id);
+        })->count();
+
+        $ctr = $impressions > 0 ? ($clicks / $impressions) * 100 : 0;
+
+        $stats = [
+            'impressions' => $impressions,
+            'clicks' => $clicks,
+            'ctr' => number_format($ctr, 2) . '%',
+        ];
+
+        return view('campaigns.stats', compact('campaign', 'stats'));
     }
 
     // ... other methods are empty for now

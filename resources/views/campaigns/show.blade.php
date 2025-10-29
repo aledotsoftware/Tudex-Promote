@@ -15,9 +15,12 @@
                                 Budget: ${{ number_format($campaign->budget, 2) }} | Model: {{ strtoupper($campaign->model) }} | Status: {{ ucfirst($campaign->status) }}
                             </p>
                         </div>
-                        <a href="{{ route('creatives.create', ['campaign_id' => $campaign->id]) }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 active:bg-indigo-700 focus:outline-none focus:border-indigo-700 focus:ring ring-indigo-300 disabled:opacity-25 transition ease-in-out duration-150">
-                            {{ __('Add Creative') }}
-                        </a>
+                        <div>
+                            <a href="{{ route('campaigns.stats', $campaign) }}" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('View Stats') }}</a>
+                            <a href="{{ route('creatives.create', ['campaign_id' => $campaign->id]) }}" class="ms-4 inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 active:bg-indigo-700 focus:outline-none focus:border-indigo-700 focus:ring ring-indigo-300 disabled:opacity-25 transition ease-in-out duration-150">
+                                {{ __('Add Creative') }}
+                            </a>
+                        </div>
                     </div>
 
                     <hr class="my-6 border-gray-200 dark:border-gray-700">
