@@ -66,9 +66,7 @@
                                             </p>
                                         </div>
                                         @if ($site->verified && $site->verification_expires_at > now())
-                                            <div>
-                                                <a href="{{ route('sites.show', $site) }}" class="text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Manage Ad Zones / Get Code') }}</a>
-                                            </div>
+                                            <button @click="open = !open" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Show Ad Code') }}</button>
                                         @else
                                             <div>
                                                 <button @click="open = !open" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Show Instructions') }}</button>
@@ -77,25 +75,46 @@
                                         @endif
                                     </div>
                                     <div x-show="open" class="mt-4 p-4 bg-gray-200 dark:bg-gray-700 rounded-lg">
-                                        <h4 class="font-semibold">{{ __('Verification Instructions') }}</h4>
-                                        <p class="mt-2">{{ __('Choose one of the following methods to verify your domain:') }}</p>
-                                        @php
-                                            $cleanDomain = str_replace(['http://', 'https://'], '', $site->domain);
-                                        @endphp
-                                        <div class="mt-4">
-                                            <h5 class="font-semibold">{{ __('Method 1: DNS TXT Record') }}</h5>
-                                            <p>{{ __("Add a TXT record to your domain's DNS settings with the following values:") }}</p>
-                                            <div class="mt-2 p-2 bg-gray-100 dark:bg-gray-800 rounded">
-                                                <code class="text-sm">adverify.{{ $cleanDomain }} IN TXT "{{ $site->verification_token }}"</code>
+                                        @if ($site->verified && $site->verification_expires_at > now())
+                                            <h4 class="font-semibold">{{ __('Ad Code Installation') }}</h4>
+                                            <p class="mt-2">{{ __('Follow these steps to display ads on your site:') }}</p>
+                                            <div class="mt-4">
+                                                <h5 class="font-semibold">{{ __('Step 1: Add the Ad Tag to Your Head') }}</h5>
+                                                <p>{{ __('Copy and paste this script tag into the `<head>` section of your website.') }}</p>
+                                                <div class="mt-2 p-2 bg-gray-100 dark:bg-gray-800 rounded">
+                                                    <code class="text-sm">&lt;script src="{{ route('ad-tag.js') }}" defer&gt;&lt;/script&gt;</code>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <div class="mt-4">
-                                            <h5 class="font-semibold">{{ __('Method 2: ads.txt File') }}</h5>
-                                            <p>{{ __('Add the following line to the `ads.txt` file at the root of your domain (e.g., `https://' . $cleanDomain . '/ads.txt`):') }}</p>
-                                            <div class="mt-2 p-2 bg-gray-100 dark:bg-gray-800 rounded">
-                                                <code class="text-sm">your-ad-network.com, {{ $site->verification_token }}, DIRECT</code>
+                                            <div class="mt-4">
+                                                <h5 class="font-semibold">{{ __('Step 2: Place the Ad Zone on Your Site') }}</h5>
+                                                <p>{{ __('Copy and paste this div tag where you want the ad to appear. Replace `YOUR_ADZONE_ID` with the actual ID from your Ad Zone.') }}</p>
+                                                <div class="mt-2 p-2 bg-gray-100 dark:bg-gray-800 rounded">
+                                                    <code class="text-sm">&lt;div class="ad-server-placeholder" data-adzone-id="YOUR_ADZONE_ID"&gt;&lt;/div&gt;</code>
+                                                </div>
+                                                <p class="mt-2">{{ __('You can create and manage your ad zones from the site management page.') }}</p>
+                                                <a href="{{ route('sites.show', $site) }}" class="mt-2 inline-block text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Manage Ad Zones') }}</a>
                                             </div>
-                                        </div>
+                                        @else
+                                            <h4 class="font-semibold">{{ __('Verification Instructions') }}</h4>
+                                            <p class="mt-2">{{ __('Choose one of the following methods to verify your domain:') }}</p>
+                                            @php
+                                                $cleanDomain = str_replace(['http://', 'https://'], '', $site->domain);
+                                            @endphp
+                                            <div class="mt-4">
+                                                <h5 class="font-semibold">{{ __('Method 1: DNS TXT Record') }}</h5>
+                                                <p>{{ __("Add a TXT record to your domain's DNS settings with the following values:") }}</p>
+                                                <div class="mt-2 p-2 bg-gray-100 dark:bg-gray-800 rounded">
+                                                    <code class="text-sm">adverify.{{ $cleanDomain }} IN TXT "{{ $site->verification_token }}"</code>
+                                                </div>
+                                            </div>
+                                            <div class="mt-4">
+                                                <h5 class="font-semibold">{{ __('Method 2: ads.txt File') }}</h5>
+                                                <p>{{ __('Add the following line to the `ads.txt` file at the root of your domain (e.g., `https://' . $cleanDomain . '/ads.txt`):') }}</p>
+                                                <div class="mt-2 p-2 bg-gray-100 dark:bg-gray-800 rounded">
+                                                    <code class="text-sm">your-ad-network.com, {{ $site->verification_token }}, DIRECT</code>
+                                                </div>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             @empty
