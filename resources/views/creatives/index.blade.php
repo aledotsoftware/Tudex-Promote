@@ -20,7 +20,7 @@
                             <a href="{{ route('creatives.show', $creative) }}" class="block p-4 bg-gray-100 dark:bg-gray-900 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
                                 <p class="text-gray-800 dark:text-gray-200">{{ $creative->file_url }}</p>
                                 <p class="text-sm text-gray-600 dark:text-gray-400">
-                                    {{ $creative->type }} - {{ $creative->width }}x{{ $creative->height }}
+                                    {{ $creative->type }}
                                 </p>
                             </a>
                         @empty

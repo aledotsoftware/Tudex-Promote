@@ -45,8 +45,6 @@ class CreativeController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
             'click_url' => ['required', 'url'],
-            'width' => ['required', 'integer', 'min:1'],
-            'height' => ['required', 'integer', 'min:1'],
         ]);
 
         // Generate HTML content from title and description
@@ -64,8 +62,6 @@ class CreativeController extends Controller
             'campaign_id' => $request->campaign_id,
             'file_url' => $path,
             'click_url' => $request->click_url,
-            'width' => $request->width,
-            'height' => $request->height,
             'type' => 'html',
         ]);
 

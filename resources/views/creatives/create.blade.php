@@ -44,21 +44,6 @@
                             <x-input-error :messages="$errors->get('click_url')" class="mt-2" />
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4 mt-4">
-                            <!-- Width -->
-                            <div>
-                                <x-input-label for="width" :value="__('Width')" />
-                                <x-text-input id="width" class="block mt-1 w-full" type="number" name="width" :value="old('width')" required />
-                                <x-input-error :messages="$errors->get('width')" class="mt-2" />
-                            </div>
-
-                            <!-- Height -->
-                            <div>
-                                <x-input-label for="height" :value="__('Height')" />
-                                <x-text-input id="height" class="block mt-1 w-full" type="number" name="height" :value="old('height')" required />
-                                <x-input-error :messages="$errors->get('height')" class="mt-2" />
-                            </div>
-                        </div>
 
                         <div class="flex items-center justify-end mt-4">
                             <x-primary-button>

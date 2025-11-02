@@ -88,6 +88,14 @@ class SiteController extends Controller
     {
         $this->authorize('update', $site);
 
+        if (app()->environment('local')) {
+            $site->update([
+                'verified' => true,
+                'verification_expires_at' => now()->addYear(),
+            ]);
+            return redirect()->route('sites.show', $site)->with('success', 'Site verified successfully for local development!');
+        }
+
         // Method 1: DNS TXT Record Verification
         try {
             $records = dns_get_record('adverify.' . $site->domain, DNS_TXT);

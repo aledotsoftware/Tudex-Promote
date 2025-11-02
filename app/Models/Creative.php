@@ -18,8 +18,6 @@ class Creative extends Model
         'campaign_id',
         'file_url',
         'click_url',
-        'width',
-        'height',
         'type',
     ];
 
