@@ -33,8 +33,9 @@ class AdZoneController extends Controller
         $request->validate([
             'site_id' => ['required', 'exists:sites,id'],
             'name' => ['required', 'string', 'max:255'],
-            'width' => ['required', 'integer', 'min:1'],
-            'height' => ['required', 'integer', 'min:1'],
+            // Width and height are optional; the client-side tag can compute sizes
+            'width' => ['nullable', 'integer', 'min:1'],
+            'height' => ['nullable', 'integer', 'min:1'],
         ]);
 
         $site = \App\Models\Site::findOrFail($request->site_id);

@@ -7,11 +7,22 @@ use App\Http\Controllers\AdZoneController;
 use App\Http\Controllers\SiteController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\File;
+use App\Http\Controllers\ApiController;
 
 Route::get('/ad-tag.js', function () {
     return response(File::get(public_path('js/ad-tag.js')))
         ->header('Content-Type', 'application/javascript');
 })->name('ad-tag.js');
+
+// Fallback: expose API endpoints under /api/* with the 'api' middleware so the
+// client tag can fetch ads and report impressions even if routes/api.php isn't
+// being loaded by the app's route provider. Using the 'api' middleware avoids
+// CSRF checks that would block beacon POSTs.
+Route::prefix('api')->middleware('api')->group(function () {
+    Route::get('/ad-request/{adZone}', [ApiController::class, 'adRequest']);
+    Route::post('/impression/{placement}', [ApiController::class, 'impression']);
+    Route::get('/click/{placement}', [ApiController::class, 'click'])->name('api.click');
+});
 
 Route::get('/', function () {
     return view('welcome');

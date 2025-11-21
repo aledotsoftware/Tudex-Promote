@@ -15,31 +15,43 @@ class ApiController extends Controller
 {
     public function adRequest(AdZone $adZone)
     {
-        // Find an active campaign with a creative that matches the ad zone dimensions
-        $campaign = Campaign::where('status', 'active')
-            ->whereHas('creatives', function ($query) use ($adZone) {
-                $query->where('width', $adZone->width)->where('height', $adZone->height);
+        // Choose creatives by type (the creatives table doesn't include width/height).
+        $type = $adZone->type ?? 'banner';
+
+        // Prefer creatives of the same type from active campaigns.
+        $creative = \App\Models\Creative::where('type', $type)
+            ->whereHas('campaign', function ($q) {
+                $q->where('status', 'active');
             })
             ->inRandomOrder()
             ->first();
 
-        if (!$campaign) {
-            return response()->json(['error' => 'No matching ad found'], 404);
+        // Fallback: any creative from an active campaign
+        if (! $creative) {
+            $creative = \App\Models\Creative::whereHas('campaign', function ($q) {
+                $q->where('status', 'active');
+            })->inRandomOrder()->first();
         }
 
-        $creative = $campaign->creatives()
-            ->where('width', $adZone->width)
-            ->where('height', $adZone->height)
-            ->inRandomOrder()
-            ->first();
+        if (! $creative) {
+            return response()->json(['error' => 'No creatives available'], 404);
+        }
 
-        // Create a placement record
+        // Ensure the creative has a valid file in storage
+        $disk = Storage::disk('public');
+        if (! $disk->exists($creative->file_url)) {
+            return response()->json(['error' => 'Creative file not found'], 404);
+        }
+
+        // Create a placement record. Include site_id because the placements table
+        // requires it in this schema.
         $placement = Placement::create([
             'creative_id' => $creative->id,
             'ad_zone_id' => $adZone->id,
+            'site_id' => $adZone->site_id,
         ]);
 
-        $htmlContent = Storage::disk('public')->get($creative->file_url);
+        $htmlContent = $disk->get($creative->file_url);
         $clickUrl = route('api.click', $placement);
         $htmlContent = str_replace('%%CLICK_URL%%', $clickUrl, $htmlContent);
 

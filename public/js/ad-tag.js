@@ -63,8 +63,29 @@
     function injectAd(placeholder, ad) {
         const iframe = document.createElement('iframe');
         iframe.srcdoc = ad.html_content;
-        iframe.width = placeholder.dataset.width || '100%';
-        iframe.height = placeholder.dataset.height || '100%';
+        // Determine width and height. If the ad zone provided explicit dimensions use them,
+        // otherwise compute based on the placeholder's available width and use a sensible
+        // default aspect ratio for height.
+        let widthPx;
+        if (placeholder.dataset.width) {
+            widthPx = parseInt(placeholder.dataset.width, 10);
+        } else {
+            // Try the placeholder's current width or its parent container's width
+            const rect = placeholder.getBoundingClientRect();
+            widthPx = rect && rect.width ? Math.round(rect.width) : (placeholder.parentElement ? placeholder.parentElement.clientWidth : window.innerWidth);
+        }
+
+        let heightPx;
+        if (placeholder.dataset.height) {
+            heightPx = parseInt(placeholder.dataset.height, 10);
+        } else {
+            // Default to a 4:1 width:height ratio (e.g., 300x75) but clamp to reasonable bounds
+            heightPx = Math.max(90, Math.min(600, Math.round(widthPx / 4)));
+        }
+
+        // Apply computed dimensions to the iframe
+        iframe.style.width = (isNaN(widthPx) ? '100%' : (widthPx + 'px'));
+        iframe.style.height = (isNaN(heightPx) ? '100%' : (heightPx + 'px'));
         iframe.style.border = 'none';
         iframe.style.overflow = 'hidden';
 

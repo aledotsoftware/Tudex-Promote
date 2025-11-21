@@ -19,6 +19,12 @@ class AdZonePolicy
      */
     public function view(User $user, AdZone $adZone)
     {
+        // If the ad zone is orphaned (site deleted), deny access instead of throwing
+        // a fatal error when trying to access properties on null.
+        if (! $adZone->site) {
+            return false;
+        }
+
         return $user->id === $adZone->site->user_id;
     }
 
@@ -42,6 +48,10 @@ class AdZonePolicy
      */
     public function update(User $user, AdZone $adZone)
     {
+        if (! $adZone->site) {
+            return false;
+        }
+
         return $user->id === $adZone->site->user_id;
     }
 
@@ -54,6 +64,10 @@ class AdZonePolicy
      */
     public function delete(User $user, AdZone $adZone)
     {
+        if (! $adZone->site) {
+            return false;
+        }
+
         return $user->id === $adZone->site->user_id;
     }
 }
