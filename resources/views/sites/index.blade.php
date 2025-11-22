@@ -66,6 +66,7 @@
                                             </p>
                                         </div>
                                         @if ($site->verified && $site->verification_expires_at > now())
+                                            <a href="{{ route('sites.stats', $site) }}" class="mr-4 text-sm text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Stats') }}</a>
                                             <button @click="open = !open" class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Show Ad Code') }}</button>
                                         @else
                                             <div>
@@ -86,13 +87,11 @@
                                                 </div>
                                             </div>
                                             <div class="mt-4">
-                                                <h5 class="font-semibold">{{ __('Step 2: Place the Ad Zone on Your Site') }}</h5>
-                                                <p>{{ __('Copy and paste this div tag where you want the ad to appear. Replace `YOUR_ADZONE_ID` with the actual ID from your Ad Zone.') }}</p>
+                                                <h5 class="font-semibold">{{ __('Step 2: Place the Ad Code on Your Site') }}</h5>
+                                                <p>{{ __('Copy and paste this div tag where you want the ad to appear. You can customize the `data-type` (e.g., banner, square).') }}</p>
                                                 <div class="mt-2 p-2 bg-gray-100 dark:bg-gray-800 rounded">
-                                                    <code class="text-sm">&lt;div class="ad-server-placeholder" data-adzone-id="YOUR_ADZONE_ID"&gt;&lt;/div&gt;</code>
+                                                    <code class="text-sm">&lt;div class="ad-server-placeholder" data-site-id="{{ $site->id }}" data-type="banner"&gt;&lt;/div&gt;</code>
                                                 </div>
-                                                <p class="mt-2">{{ __('You can create and manage your ad zones from the site management page.') }}</p>
-                                                <a href="{{ route('sites.show', $site) }}" class="mt-2 inline-block text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">{{ __('Manage Ad Zones') }}</a>
                                             </div>
                                         @else
                                             <h4 class="font-semibold">{{ __('Verification Instructions') }}</h4>

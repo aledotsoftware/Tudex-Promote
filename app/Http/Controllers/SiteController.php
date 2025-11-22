@@ -128,4 +128,20 @@ class SiteController extends Controller
 
         return redirect()->route('sites.index')->with('error', 'Could not verify site. Please check the instructions and try again.');
     }
+    public function stats(Site $site)
+    {
+        $this->authorize('view', $site);
+
+        $impressions = \App\Models\AdImpression::where('site_id', $site->id)->count();
+        $clicks = \App\Models\AdClick::where('site_id', $site->id)->count();
+        $ctr = $impressions > 0 ? ($clicks / $impressions) * 100 : 0;
+
+        $stats = [
+            'impressions' => $impressions,
+            'clicks' => $clicks,
+            'ctr' => number_format($ctr, 2) . '%',
+        ];
+
+        return view('sites.stats', compact('site', 'stats'));
+    }
 }

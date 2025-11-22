@@ -4,7 +4,7 @@
  * This script scans the host page for ad placeholders and injects ad content
  * served from our ad server. It also tracks ad visibility (viewability).
  */
-(function() {
+(function () {
     // Configuration
     const API_BASE_URL = 'http://127.0.0.1:8000/api'; // In production, this should be dynamic
     const PLACEHOLDER_CLASS = 'ad-server-placeholder';
@@ -29,13 +29,15 @@
      * @param {HTMLElement} placeholder - The div element for the ad.
      */
     function loadAd(placeholder) {
-        const adZoneId = placeholder.dataset.adzoneId;
-        if (!adZoneId) {
-            console.error('Ad Server: Placeholder is missing "data-adzone-id".', placeholder);
+        const siteId = placeholder.dataset.siteId;
+        const type = placeholder.dataset.type || 'banner'; // Default to banner if not specified
+
+        if (!siteId) {
+            console.error('Ad Server: Placeholder is missing "data-site-id".', placeholder);
             return;
         }
 
-        const adUrl = `${API_BASE_URL}/ad-request/${adZoneId}`;
+        const adUrl = `${API_BASE_URL}/ad-request?site_id=${siteId}&type=${type}`;
 
         fetch(adUrl)
             .then(response => {
@@ -50,7 +52,7 @@
                 }
             })
             .catch(error => {
-                console.error(`Ad Server: Failed to load ad for Zone ${adZoneId}:`, error);
+                console.error(`Ad Server: Failed to load ad for Site ${siteId}:`, error);
                 placeholder.style.display = 'none'; // Hide placeholder on failure
             });
     }
@@ -62,7 +64,35 @@
      */
     function injectAd(placeholder, ad) {
         const iframe = document.createElement('iframe');
-        iframe.srcdoc = ad.html_content;
+
+        // Extract style preferences from placeholder
+        const styles = {
+            '--ad-font-family': placeholder.dataset.fontFamily,
+            '--ad-bg-color': placeholder.dataset.bgColor,
+            '--ad-title-color': placeholder.dataset.titleColor,
+            '--ad-desc-color': placeholder.dataset.descColor,
+        };
+
+        // Build CSS variables string
+        let styleInjection = '<style>:root {';
+        for (const [key, value] of Object.entries(styles)) {
+            if (value) {
+                styleInjection += `${key}: ${value} !important;`;
+            }
+        }
+        styleInjection += '}</style>';
+
+        // Inject styles into the HTML content
+        // We prepend it to ensure it overrides defaults but allows the template to use variables
+        let finalHtml = ad.html_content;
+        if (finalHtml.includes('<head>')) {
+            finalHtml = finalHtml.replace('<head>', `<head>${styleInjection}`);
+        } else {
+            finalHtml = styleInjection + finalHtml;
+        }
+
+        iframe.srcdoc = finalHtml;
+
         // Determine width and height. If the ad zone provided explicit dimensions use them,
         // otherwise compute based on the placeholder's available width and use a sensible
         // default aspect ratio for height.
@@ -88,6 +118,7 @@
         iframe.style.height = (isNaN(heightPx) ? '100%' : (heightPx + 'px'));
         iframe.style.border = 'none';
         iframe.style.overflow = 'hidden';
+        iframe.style.backgroundColor = 'transparent'; // Ensure transparency
 
         // Clear the placeholder and append the iframe
         placeholder.innerHTML = '';

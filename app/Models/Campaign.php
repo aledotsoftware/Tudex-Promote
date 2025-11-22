@@ -21,7 +21,11 @@ class Campaign extends Model
         'start_at',
         'end_at',
         'model',
-        'status',
+        'is_active',
+        'title_color',
+        'description_color',
+        'accent_color',
+        'font_family',
     ];
 
     public function creatives()

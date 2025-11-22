@@ -40,6 +40,10 @@ class CampaignController extends Controller
             'start_at' => ['nullable', 'date'],
             'end_at' => ['nullable', 'date', 'after_or_equal:start_at'],
             'model' => ['required', 'string', 'in:cpc,cpm'],
+            'title_color' => ['nullable', 'string', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
+            'description_color' => ['nullable', 'string', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
+            'accent_color' => ['nullable', 'string', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
+            'font_family' => ['nullable', 'string', 'max:255'],
         ]);
 
         auth()->user()->campaigns()->create($request->all());
@@ -80,5 +84,23 @@ class CampaignController extends Controller
         return view('campaigns.stats', compact('campaign', 'stats'));
     }
 
-    // ... other methods are empty for now
+    public function destroy(Campaign $campaign)
+    {
+        $this->authorize('delete', $campaign);
+        $campaign->delete();
+
+        return redirect()->route('campaigns.index')->with('success', 'Campaign deleted successfully.');
+    }
+
+    public function toggleStatus(Campaign $campaign)
+    {
+        $this->authorize('update', $campaign);
+        
+        $campaign->update([
+            'is_active' => ! $campaign->is_active
+        ]);
+
+        $status = $campaign->is_active ? 'activated' : 'paused';
+        return redirect()->route('campaigns.index')->with('success', "Campaign {$status} successfully.");
+    }
 }

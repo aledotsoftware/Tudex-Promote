@@ -54,13 +54,9 @@ class CreativeController extends Controller
             'click_url' => $request->click_url,
         ])->render();
 
-        // We'll store the HTML content in a file and save the path.
-        $path = 'creatives/' . uniqid() . '.html';
-        \Illuminate\Support\Facades\Storage::disk('public')->put($path, $htmlContent);
-
         Creative::create([
             'campaign_id' => $request->campaign_id,
-            'file_url' => $path,
+            'html_content' => $htmlContent,
             'click_url' => $request->click_url,
             'type' => 'html',
         ]);
@@ -78,5 +74,23 @@ class CreativeController extends Controller
         return view('creatives.show', compact('creative'));
     }
 
-    // ... other methods are empty for now
+    public function destroy(Creative $creative)
+    {
+        $this->authorize('delete', $creative);
+        $creative->delete();
+
+        return redirect()->route('creatives.index')->with('success', 'Creative deleted successfully.');
+    }
+
+    public function toggleStatus(Creative $creative)
+    {
+        $this->authorize('update', $creative);
+        
+        $creative->update([
+            'is_active' => ! $creative->is_active
+        ]);
+
+        $status = $creative->is_active ? 'activated' : 'paused';
+        return redirect()->route('creatives.index')->with('success', "Creative {$status} successfully.");
+    }
 }

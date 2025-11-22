@@ -14,15 +14,10 @@ Route::get('/ad-tag.js', function () {
         ->header('Content-Type', 'application/javascript');
 })->name('ad-tag.js');
 
-// Fallback: expose API endpoints under /api/* with the 'api' middleware so the
-// client tag can fetch ads and report impressions even if routes/api.php isn't
-// being loaded by the app's route provider. Using the 'api' middleware avoids
-// CSRF checks that would block beacon POSTs.
-Route::prefix('api')->middleware('api')->group(function () {
-    Route::get('/ad-request/{adZone}', [ApiController::class, 'adRequest']);
-    Route::post('/impression/{placement}', [ApiController::class, 'impression']);
-    Route::get('/click/{placement}', [ApiController::class, 'click'])->name('api.click');
-});
+Route::get('/api/ad-request', [ApiController::class, 'adRequest'])->name('api.ad-request');
+Route::get('/api/impression/{placement}', [ApiController::class, 'impression'])->name('api.impression');
+Route::get('/api/click/{placement}', [ApiController::class, 'click'])->name('api.click');
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -47,9 +42,12 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('sites', SiteController::class)->middleware('role:publisher');
     Route::get('sites/{site}/verify', [SiteController::class, 'verify'])->name('sites.verify')->middleware('role:publisher');
+    Route::get('sites/{site}/stats', [SiteController::class, 'stats'])->name('sites.stats')->middleware('role:publisher');
 
     Route::resource('creatives', CreativeController::class)->middleware('role:advertiser');
+    Route::post('creatives/{creative}/toggle-status', [CreativeController::class, 'toggleStatus'])->name('creatives.toggle-status')->middleware('role:advertiser');
     Route::resource('campaigns', CampaignController::class)->middleware('role:advertiser');
+    Route::post('campaigns/{campaign}/toggle-status', [CampaignController::class, 'toggleStatus'])->name('campaigns.toggle-status')->middleware('role:advertiser');
     Route::get('campaigns/{campaign}/stats', [CampaignController::class, 'stats'])->name('campaigns.stats')->middleware('role:advertiser');
     Route::resource('adzones', AdZoneController::class)->middleware('role:publisher');
     Route::get('adzones/{adzone}/tag', [AdZoneController::class, 'tag'])->name('adzones.tag')->middleware('role:publisher');

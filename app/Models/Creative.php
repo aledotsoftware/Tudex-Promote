@@ -17,8 +17,10 @@ class Creative extends Model
     protected $fillable = [
         'campaign_id',
         'file_url',
+        'html_content',
         'click_url',
         'type',
+        'is_active',
     ];
 
     public function campaign()

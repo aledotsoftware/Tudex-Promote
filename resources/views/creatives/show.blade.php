@@ -18,7 +18,13 @@
                     <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">{{ __('Preview') }}</h3>
                     <div class="mt-4">
                         @if ($creative->type === 'html')
-                            <iframe srcdoc="{{ Storage::disk('public')->get($creative->file_url) }}" class="w-full h-auto border"></iframe>
+                            @if ($creative->html_content)
+                                <iframe srcdoc="{{ $creative->html_content }}" class="w-full h-64 border-0"></iframe>
+                            @elseif ($creative->file_url && Storage::disk('public')->exists($creative->file_url))
+                                <iframe srcdoc="{{ Storage::disk('public')->get($creative->file_url) }}" class="w-full h-64 border-0"></iframe>
+                            @else
+                                <p class="text-red-500">{{ __("Creative content not found.") }}</p>
+                            @endif
                         @else
                             <p>{{ __("Preview is not available for this creative type.") }}</p>
                         @endif

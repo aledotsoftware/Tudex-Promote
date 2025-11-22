@@ -3,202 +3,124 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
-        <title>Tudex Promote</title>
-
+        <title>Tudex Promote - Premium Ad Network</title>
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
-
-        <!-- Styles / Scripts -->
+        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
-        <header class="bg-white dark:bg-gray-900 shadow-md">
-            <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-                <a href="/" class="text-2xl font-bold text-gray-800 dark:text-white">Tudex Promote</a>
-                <div>
-                    <a href="#" class="px-4">Blog</a>
-                    @if (Route::has('login'))
-                        @auth
-                            <a href="{{ url('/dashboard') }}" class="px-4">Dashboard</a>
-                        @else
-                            <a href="{{ route('login') }}" class="px-4">Iniciar sesión</a>
-                            @if (Route::has('register'))
-                                <a href="{{ route('register') }}" class="px-4 py-2 bg-blue-600 text-white rounded-md">Regístrese</a>
-                            @endif
-                        @endauth
-                    @endif
+    <body class="antialiased font-sans bg-gray-50 text-gray-900">
+        <div class="relative min-h-screen flex flex-col">
+            <!-- Navbar -->
+            <nav class="absolute top-0 left-0 right-0 z-50 px-6 py-6">
+                <div class="max-w-7xl mx-auto flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <div class="bg-brand-600 rounded-lg p-1.5">
+                            <!-- <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> -->
+                        </div>
+                        <span class="font-display font-bold text-xl tracking-tight text-gray-900">Tudex<span class="text-brand-600">Promote</span></span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        @if (Route::has('login'))
+                            @auth
+                                <a href="{{ url('/dashboard') }}" class="text-sm font-semibold text-gray-700 hover:text-brand-600">Dashboard</a>
+                            @else
+                                <a href="{{ route('login') }}" class="text-sm font-semibold text-gray-700 hover:text-brand-600">Log in</a>
+                                @if (Route::has('register'))
+                                    <a href="{{ route('register') }}" class="px-4 py-2 bg-brand-600 text-white rounded-lg text-sm font-semibold hover:bg-brand-700 transition shadow-lg shadow-brand-600/20">Get Started</a>
+                                @endif
+                            @endauth
+                        @endif
+                    </div>
                 </div>
             </nav>
-        </header>
 
-        <main>
-            <section class="bg-blue-700 text-white text-center py-20">
-                <div class="container mx-auto px-6">
-                    <h1 class="text-4xl font-bold mb-4">La mejor red publicitaria y plataforma de monetización de tráfico</h1>
-                    <p class="text-xl mb-8">La mejor red publicitaria para anunciantes y editores, con una plataforma autoservicio fácil de usar, soporte personalizado y alcance global.</p>
-                    <div>
-                        <a href="{{ route('register') }}" class="bg-white text-blue-700 font-bold py-3 px-6 rounded-md mr-4">Ejecutar campañas publicitarias</a>
-                        <a href="{{ route('register') }}" class="bg-gray-800 text-white font-bold py-3 px-6 rounded-md">Monetizar tráfico</a>
+            <!-- Hero Section -->
+            <div class="relative pt-32 pb-20 sm:pt-40 sm:pb-24 overflow-hidden">
+                <div class="absolute inset-0 -z-10">
+                    <div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)]"></div>
+                    <div class="absolute top-0 right-0 -translate-y-12 translate-x-1/4 blur-3xl opacity-30">
+                        <div class="aspect-[1155/678] w-[72.1875rem] bg-gradient-to-tr from-brand-200 to-brand-600 clip-path-polygon"></div>
+                    </div>
+                    <div class="absolute bottom-0 left-0 translate-y-12 -translate-x-1/4 blur-3xl opacity-30">
+                        <div class="aspect-[1155/678] w-[72.1875rem] bg-gradient-to-tr from-accent-200 to-accent-600 clip-path-polygon"></div>
                     </div>
                 </div>
-            </section>
 
-            <section class="py-20">
-                <div class="container mx-auto px-6 text-center">
-                    <h2 class="text-3xl font-bold mb-8">La mejor red publicitaria para anunciantes, editores y agencias</h2>
-                    <p class="text-lg text-gray-600 dark:text-gray-400 max-w-4xl mx-auto">
-                        Tudex Promote es una plataforma de publicidad en línea líder, con miles de millones de impresiones de alta calidad, opciones de segmentación basadas en rendimiento y soluciones antifraude, que conecta marcas con sus clientes potenciales en todo el mundo y ayuda a los editores a ganar dinero en línea.
+                <div class="max-w-7xl mx-auto px-6 text-center">
+                    <h1 class="text-5xl md:text-7xl font-display font-bold tracking-tight text-gray-900 mb-8 animate-slide-up">
+                        Monetize & Advertise <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-accent-500">With Intelligence</span>
+                    </h1>
+                    <p class="text-xl text-gray-600 max-w-2xl mx-auto mb-10 animate-slide-up" style="animation-delay: 0.1s;">
+                        The next-generation ad network that adapts to your site's aesthetics. High-performing ads for publishers, targeted reach for advertisers.
                     </p>
-                </div>
-            </section>
-
-            <section class="bg-gray-100 dark:bg-gray-800 py-20">
-                <div class="container mx-auto px-6">
-                    <div class="flex flex-wrap -mx-4">
-                        <div class="w-full md:w-1/2 px-4 mb-8">
-                            <div class="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8">
-                                <h3 class="text-2xl font-bold mb-4">Anunciantes</h3>
-                                <p class="text-gray-600 dark:text-gray-400 mb-6">Tudex Promote es la mejor red publicitaria para anunciantes de todo el mundo.</p>
-                                <ul class="list-disc list-inside text-gray-600 dark:text-gray-400">
-                                    <li>Opciones avanzadas de segmentación</li>
-                                    <li>Fuentes de tráfico directo</li>
-                                    <li>Plataforma de autoservicio</li>
-                                    <li>Servicio totalmente gestionado</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="w-full md:w-1/2 px-4 mb-8">
-                            <div class="bg-white dark:bg-gray-900 rounded-lg shadow-lg p-8">
-                                <h3 class="text-2xl font-bold mb-4">Editores</h3>
-                                <p class="text-gray-600 dark:text-gray-400 mb-6">Tudex Promote es la red publicitaria que mejor paga a webmasters y bloggers.</p>
-                                <ul class="list-disc list-inside text-gray-600 dark:text-gray-400">
-                                    <li>Soluciones Anti AdBlock</li>
-                                    <li>Herramientas avanzadas de API</li>
-                                    <li>Pagos semanales</li>
-                                    <li>Sólo anuncios limpios preaprobados</li>
-                                </ul>
-                            </div>
-                        </div>
+                    <div class="flex flex-col sm:flex-row justify-center gap-4 animate-slide-up" style="animation-delay: 0.2s;">
+                        <a href="{{ route('register') }}" class="px-8 py-4 bg-brand-600 text-white rounded-xl font-semibold text-lg hover:bg-brand-700 transition shadow-xl shadow-brand-600/20 flex items-center justify-center gap-2">
+                            Start Now
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                        </a>
+                        <a href="#features" class="px-8 py-4 bg-white text-gray-700 border border-gray-200 rounded-xl font-semibold text-lg hover:bg-gray-50 transition flex items-center justify-center">
+                            Learn More
+                        </a>
                     </div>
-                </div>
-            </section>
-
-            <section class="py-20">
-                <div class="container mx-auto px-6 text-center">
-                    <h2 class="text-3xl font-bold mb-12">6 formatos publicitarios que mejor convierten</h2>
-                    <div class="flex flex-wrap -mx-4">
-                        <div class="w-full md:w-1/3 px-4 mb-8">
-                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-                                <h4 class="text-xl font-bold mb-4">Popunder</h4>
-                                <p>Basado en CPM, un anuncio popunder o popup es un tipo de anuncio que aparece en una nueva ventana o pestaña detrás de la actual.</p>
-                            </div>
-                        </div>
-                        <div class="w-full md:w-1/3 px-4 mb-8">
-                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-                                <h4 class="text-xl font-bold mb-4">In-Page</h4>
-                                <p>Basado en CPM o CPC, In-Page es un formato publicitario que se parece a una notificación push en un sitio web.</p>
-                            </div>
-                        </div>
-                        <div class="w-full md:w-1/3 px-4 mb-8">
-                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-                                <h4 class="text-xl font-bold mb-4">Vídeo VAST</h4>
-                                <p>Un enlace con un feed de anuncios que se coloca en un reproductor de vídeo de un sitio web. Los anuncios se mostrarán antes del vídeo principal.</p>
-                            </div>
-                        </div>
-                        <div class="w-full md:w-1/3 px-4 mb-8">
-                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-                                <h4 class="text-xl font-bold mb-4">Vídeo slider</h4>
-                                <p>Cuando los visitantes visiten un sitio web, el anuncio en vídeo aparecerá en la esquina inferior derecha.</p>
-                            </div>
-                        </div>
-                         <div class="w-full md:w-1/3 px-4 mb-8">
-                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-                                <h4 class="text-xl font-bold mb-4">Banner</h4>
-                                <p>Basado en CPM o CPC, el banner es uno de los formatos publicitarios más atractivos, se coloca en una página del sitio web.</p>
-                            </div>
-                        </div>
-                         <div class="w-full md:w-1/3 px-4 mb-8">
-                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-                                <h4 class="text-xl font-bold mb-4">MultiTag</h4>
-                                <p>MultiTag es una potente función que permite a los webmasters mostrar varios formatos de anuncios en su sitio web simultáneamente.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="bg-blue-700 text-white py-20">
-                <div class="container mx-auto px-6 text-center">
-                    <h2 class="text-3xl font-bold mb-8">¡Únete a Tudex Promote ahora!</h2>
-                    <p class="text-xl mb-8">La mejor red publicitaria para potenciar tus resultados en publicidad online.</p>
-                    <a href="{{ route('register') }}" class="bg-white text-blue-700 font-bold py-3 px-6 rounded-md">Crear una cuenta</a>
-                </div>
-            </section>
-
-            <section class="py-20">
-                <div class="container mx-auto px-6">
-                    <h2 class="text-3xl font-bold text-center mb-12">Nuestros clientes disfrutaron con Tudex Promote</h2>
-                    <div class="flex flex-wrap -mx-4">
-                        <div class="w-full md:w-1/3 px-4 mb-8">
-                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-                                <p class="text-gray-600 dark:text-gray-400 mb-4">"Tudex Promote es una plataforma fantástica con una interfaz de usuario agradable. Ofrecen una amplia gama de opciones de segmentación."</p>
-                                <p class="font-bold">- Luke, Co-founder Afflift.com</p>
-                            </div>
-                        </div>
-                        <div class="w-full md:w-1/3 px-4 mb-8">
-                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-                                <p class="text-gray-600 dark:text-gray-400 mb-4">"¡Una fuente de tráfico sólida! No solo cumple, sino que supera nuestras expectativas. Ofrece precios de puja competitivos."</p>
-                                <p class="font-bold">- Mobidea, Affiliate network</p>
-                            </div>
-                        </div>
-                        <div class="w-full md:w-1/3 px-4 mb-8">
-                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-                                <p class="text-gray-600 dark:text-gray-400 mb-4">"Tudex Promote ha demostrado ser un socio publicitario fiable y eficiente. Sus características avanzadas y su tráfico de alta calidad son de primera categoría."</p>
-                                <p class="font-bold">- PIN-UP Partners, affiliate network</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <footer class="bg-gray-800 text-white py-12">
-            <div class="container mx-auto px-6">
-                <div class="flex flex-wrap">
-                    <div class="w-full md:w-1/4 mb-8">
-                        <h4 class="font-bold mb-4">Empezar</h4>
-                        <ul>
-                            <li><a href="{{ route('register') }}">Crear una cuenta</a></li>
-                            <li><a href="{{ route('login') }}">Iniciar sesión</a></li>
-                        </ul>
-                    </div>
-                    <div class="w-full md:w-1/4 mb-8">
-                        <h4 class="font-bold mb-4">Recursos</h4>
-                        <ul>
-                            <li><a href="#">Blog</a></li>
-                            <li><a href="#">Historias de éxito</a></li>
-                            <li><a href="#">Preguntas frecuentes</a></li>
-                        </ul>
-                    </div>
-                    <div class="w-full md:w-1/4 mb-8">
-                        <h4 class="font-bold mb-4">Empresa</h4>
-                        <ul>
-                            <li><a href="#">Quiénes somos</a></li>
-                            <li><a href="#">Carreras profesionales</a></li>
-                            <li><a href="#">Contacto</a></li>
-                        </ul>
-                    </div>
-                    <div class="w-full md:w-1/4 mb-8">
-                        <h4 class="font-bold mb-4">Contacto</h4>
-                        <p>support@tudexpromote.com</p>
-                    </div>
-                </div>
-                <div class="text-center pt-8 border-t border-gray-700">
-                    <p>&copy; 2025 Tudex Promote. Todos los derechos reservados.</p>
                 </div>
             </div>
-        </footer>
+
+            <!-- Features Section -->
+            <div id="features" class="py-24 bg-white">
+                <div class="max-w-7xl mx-auto px-6">
+                    <div class="text-center mb-16">
+                        <h2 class="text-3xl font-display font-bold text-gray-900 mb-4">Why Choose Tudex Promote?</h2>
+                        <p class="text-gray-600 max-w-2xl mx-auto">We bridge the gap between content and commerce with adaptive technology.</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-3 gap-8">
+                        <!-- Feature 1 -->
+                        <div class="p-8 rounded-2xl bg-gray-50 border border-gray-100 hover:shadow-lg transition duration-300">
+                            <div class="w-12 h-12 bg-brand-100 rounded-xl flex items-center justify-center text-brand-600 mb-6">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-3">Adaptive Design</h3>
+                            <p class="text-gray-600">Our ads automatically inherit your site's fonts and colors for a seamless, native feel.</p>
+                        </div>
+
+                        <!-- Feature 2 -->
+                        <div class="p-8 rounded-2xl bg-gray-50 border border-gray-100 hover:shadow-lg transition duration-300">
+                            <div class="w-12 h-12 bg-accent-100 rounded-xl flex items-center justify-center text-accent-600 mb-6">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-3">Real-time Analytics</h3>
+                            <p class="text-gray-600">Track impressions, clicks, and revenue in real-time with our comprehensive dashboard.</p>
+                        </div>
+
+                        <!-- Feature 3 -->
+                        <div class="p-8 rounded-2xl bg-gray-50 border border-gray-100 hover:shadow-lg transition duration-300">
+                            <div class="w-12 h-12 bg-brand-100 rounded-xl flex items-center justify-center text-brand-600 mb-6">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-900 mb-3">High CPMs</h3>
+                            <p class="text-gray-600">Maximize your revenue with our optimized bidding system and premium advertiser network.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="bg-gray-900 text-white py-12">
+                <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
+                    <div class="flex items-center gap-2 mb-4 md:mb-0">
+                        <div class="bg-brand-600 rounded-lg p-1.5">
+                            <!-- <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> -->
+                        </div>
+                        <span class="font-display font-bold text-xl tracking-tight">Tudex<span class="text-brand-400">Promote</span></span>
+                    </div>
+                    <div class="text-gray-400 text-sm">
+                        &copy; {{ date('Y') }} Tudex Promote. All rights reserved.
+                    </div>
+                </div>
+            </footer>
+        </div>
     </body>
 </html>

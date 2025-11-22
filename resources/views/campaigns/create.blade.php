@@ -58,6 +58,46 @@
                                 <x-input-error :messages="$errors->get('end_at')" class="mt-2" />
                             </div>
                         </div>
+                        
+                        <!-- Ad Style Settings -->
+                        <div class="mt-8 border-t pt-6 dark:border-gray-700">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">{{ __('Ad Appearance') }}</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <x-input-label for="title_color" :value="__('Title Color')" />
+                                    <div class="flex items-center mt-1">
+                                        <input type="color" id="title_color" name="title_color" value="#1a0dab" class="h-10 w-10 rounded border border-gray-300 cursor-pointer">
+                                        <x-text-input class="ml-2 block w-full" type="text" name="title_color_text" value="#1a0dab" onchange="document.getElementById('title_color').value = this.value" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <x-input-label for="description_color" :value="__('Description Color')" />
+                                    <div class="flex items-center mt-1">
+                                        <input type="color" id="description_color" name="description_color" value="#3c4043" class="h-10 w-10 rounded border border-gray-300 cursor-pointer">
+                                        <x-text-input class="ml-2 block w-full" type="text" name="description_color_text" value="#3c4043" onchange="document.getElementById('description_color').value = this.value" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <x-input-label for="accent_color" :value="__('Accent/Button Color')" />
+                                    <div class="flex items-center mt-1">
+                                        <input type="color" id="accent_color" name="accent_color" value="#1a73e8" class="h-10 w-10 rounded border border-gray-300 cursor-pointer">
+                                        <x-text-input class="ml-2 block w-full" type="text" name="accent_color_text" value="#1a73e8" onchange="document.getElementById('accent_color').value = this.value" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <x-input-label for="font_family" :value="__('Font Family')" />
+                                    <select id="font_family" name="font_family" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                                        <option value="Roboto, sans-serif">Roboto (Default)</option>
+                                        <option value="'Open Sans', sans-serif">Open Sans</option>
+                                        <option value="'Lato', sans-serif">Lato</option>
+                                        <option value="'Montserrat', sans-serif">Montserrat</option>
+                                        <option value="Arial, sans-serif">Arial</option>
+                                        <option value="Helvetica, sans-serif">Helvetica</option>
+                                        <option value="Georgia, serif">Georgia</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="flex items-center justify-end mt-4">
                             <x-primary-button>

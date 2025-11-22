@@ -13,15 +13,21 @@
                     <p class="mt-2">{{ __('Copy and paste this code into your website where you want the ad to appear.') }}</p>
 
                     <div class="mt-4">
-                    <textarea class="w-full h-48 p-2 border border-gray-300 rounded-md" readonly><!-- Ad Server Tag -->
-                    <div class="ad-server-placeholder"
-                        data-adzone-id="{{ $adZone->id }}"
-                        @if($adZone->width) data-width="{{ $adZone->width }}" @endif
-                        @if($adZone->height) data-height="{{ $adZone->height }}" @endif>
-                    </div>
-                    <script src="{{ asset('js/ad-tag.js') }}" async defer></script>
-                    <!-- End Ad Server Tag -->
-                    </textarea>
+                    <textarea class="w-full h-64 p-4 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl font-mono text-sm text-gray-600 dark:text-gray-300 focus:ring-brand-500 focus:border-brand-500" readonly><!-- Ad Server Tag -->
+<div class="ad-server-placeholder"
+     data-adzone-id="{{ $adZone->id }}"
+     @if($adZone->width) data-width="{{ $adZone->width }}" @endif
+     @if($adZone->height) data-height="{{ $adZone->height }}" @endif
+     data-font-family="inherit"
+     data-bg-color="transparent"
+     data-title-color="#1a0dab"
+     data-desc-color="#4d5156">
+</div>
+<script src="{{ asset('js/ad-tag.js') }}" async defer></script>
+<!-- End Ad Server Tag --></textarea>
+                    <p class="mt-4 text-sm text-gray-500">
+                        You can customize the <code>data-*</code> attributes to match your site's design.
+                    </p>
                                     </div>
                 </div>
             </div>
