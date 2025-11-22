@@ -44,6 +44,19 @@
                             <x-input-error :messages="$errors->get('click_url')" class="mt-2" />
                         </div>
 
+                        <!-- Type -->
+                        <div class="mt-4">
+                            <x-input-label for="type" :value="__('Ad Type')" />
+                            <select id="type" name="type" class="block mt-1 w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm">
+                                <option value="wide">Wide Banner (Horizontal)</option>
+                                <option value="tall">Tall Skyscraper (Vertical)</option>
+                                <option value="square">Square (Cuadrado)</option>
+                                <option value="popup">Pop-up (Overlay)</option>
+                                <option value="interstitial">Interstitial (Full Screen)</option>
+                            </select>
+                            <x-input-error :messages="$errors->get('type')" class="mt-2" />
+                        </div>
+
 
                         <div class="flex items-center justify-end mt-4">
                             <x-primary-button>

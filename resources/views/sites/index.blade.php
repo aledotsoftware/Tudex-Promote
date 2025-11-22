@@ -81,16 +81,34 @@
                                             <p class="mt-2">{{ __('Follow these steps to display ads on your site:') }}</p>
                                             <div class="mt-4">
                                                 <h5 class="font-semibold">{{ __('Step 1: Add the Ad Tag to Your Head') }}</h5>
-                                                <p>{{ __('Copy and paste this script tag into the `<head>` section of your website.') }}</p>
+                                                <p>{{ __('Copy and paste this script tag into the `<head>` section of your website. That\'s it! The system will automatically place ads for you.') }}</p>
                                                 <div class="mt-2 p-2 bg-gray-100 dark:bg-gray-800 rounded">
-                                                    <code class="text-sm">&lt;script src="{{ route('ad-tag.js') }}" defer&gt;&lt;/script&gt;</code>
+                                                    <code class="text-sm">&lt;script src="{{ route('ad-tag.js') }}" data-site-id="{{ $site->id }}" defer&gt;&lt;/script&gt;</code>
                                                 </div>
                                             </div>
                                             <div class="mt-4">
-                                                <h5 class="font-semibold">{{ __('Step 2: Place the Ad Code on Your Site') }}</h5>
-                                                <p>{{ __('Copy and paste this div tag where you want the ad to appear. You can customize the `data-type` (e.g., banner, square).') }}</p>
-                                                <div class="mt-2 p-2 bg-gray-100 dark:bg-gray-800 rounded">
-                                                    <code class="text-sm">&lt;div class="ad-server-placeholder" data-site-id="{{ $site->id }}" data-type="banner"&gt;&lt;/div&gt;</code>
+                                                <h5 class="font-semibold">{{ __('Step 2: Place the Ad Code') }}</h5>
+                                                <p>{{ __('Choose the size that fits your layout and paste the code where you want the ad to appear.') }}</p>
+                                                
+                                                <div class="mt-4">
+                                                    <p class="font-semibold text-sm">{{ __('Option A: Wide Banner (Ancho) - Best for top of page or between content') }}</p>
+                                                    <div class="mt-1 p-2 bg-gray-100 dark:bg-gray-800 rounded">
+                                                        <code class="text-sm">&lt;div class="ad-server-placeholder" data-site-id="{{ $site->id }}" data-type="wide"&gt;&lt;/div&gt;</code>
+                                                    </div>
+                                                </div>
+
+                                                <div class="mt-4">
+                                                    <p class="font-semibold text-sm">{{ __('Option B: Tall Skyscraper (Alto) - Best for sidebars') }}</p>
+                                                    <div class="mt-1 p-2 bg-gray-100 dark:bg-gray-800 rounded">
+                                                        <code class="text-sm">&lt;div class="ad-server-placeholder" data-site-id="{{ $site->id }}" data-type="tall"&gt;&lt;/div&gt;</code>
+                                                    </div>
+                                                </div>
+
+                                                <div class="mt-4">
+                                                    <p class="font-semibold text-sm">{{ __('Option C: Square (Cuadrado) - Best for inside content or grids') }}</p>
+                                                    <div class="mt-1 p-2 bg-gray-100 dark:bg-gray-800 rounded">
+                                                        <code class="text-sm">&lt;div class="ad-server-placeholder" data-site-id="{{ $site->id }}" data-type="square"&gt;&lt;/div&gt;</code>
+                                                    </div>
                                                 </div>
                                             </div>
                                         @else

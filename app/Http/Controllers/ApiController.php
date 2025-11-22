@@ -27,9 +27,9 @@ class ApiController extends Controller
         // $site = \App\Models\Site::find($siteId);
         // if (!$site->verified) ...
 
-        // Choose creatives by type
-        $creative = \App\Models\Creative::where('type', $type)
-            ->whereHas('campaign', function ($q) {
+        // Choose creatives. We allow ANY type to be served, assuming the creative is responsive.
+        // We prioritize active campaigns and active creatives.
+        $creative = \App\Models\Creative::whereHas('campaign', function ($q) {
                 $q->where('is_active', true);
             })
             ->where('is_active', true)

@@ -45,6 +45,7 @@ class CreativeController extends Controller
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:255'],
             'click_url' => ['required', 'url'],
+            'type' => ['required', 'string', 'in:wide,tall,square,popup,interstitial'],
         ]);
 
         // Generate HTML content from title and description
@@ -58,7 +59,7 @@ class CreativeController extends Controller
             'campaign_id' => $request->campaign_id,
             'html_content' => $htmlContent,
             'click_url' => $request->click_url,
-            'type' => 'html',
+            'type' => $request->type,
         ]);
 
         return redirect()->route('creatives.index')->with('success', 'Creative added successfully.');

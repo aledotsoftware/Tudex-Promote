@@ -1,89 +1,179 @@
 /**
- * Ad Server Tag
+ * Tudex Ads - Ad Tag
  *
- * This script scans the host page for ad placeholders and injects ad content
- * served from our ad server. It also tracks ad visibility (viewability).
+ * Supports 3 Standard Display Types:
+ * 1. Wide (Ancho) - data-type="wide"
+ * 2. Tall (Alto) - data-type="tall"
+ * 3. Square (Cuadrado) - data-type="square"
  */
 (function () {
-    // Configuration
-    const API_BASE_URL = 'http://127.0.0.1:8000/api'; // In production, this should be dynamic
-    const PLACEHOLDER_CLASS = 'ad-server-placeholder';
-    const VIEWABILITY_THRESHOLD = 0.5; // 50% of the ad must be visible
-    const VIEWABILITY_TIME = 1000; // for at least 1 second
+    const API_BASE_URL = 'http://127.0.0.1:8000/api';
 
-    /**
-     * Finds all ad placeholders on the page and loads an ad for each.
-     */
     function init() {
-        const placeholders = document.querySelectorAll(`.${PLACEHOLDER_CLASS}`);
-        if (placeholders.length === 0) {
-            console.log('Ad Server: No ad placeholders found on this page.');
-            return;
+        const placeholders = document.querySelectorAll('.ad-server-placeholder');
+        placeholders.forEach(loadAd);
+
+        // Automatically try to load special formats if site ID is available
+        // We can get site ID from the first placeholder if available, or it should be passed in script tag
+        // For now, let's check if we can find a site ID
+        let siteId = null;
+        const scriptTag = document.currentScript || document.querySelector('script[data-site-id]');
+        if (scriptTag) {
+            siteId = scriptTag.dataset.siteId;
+        } else if (placeholders.length > 0) {
+            siteId = placeholders[0].dataset.siteId;
         }
 
-        placeholders.forEach(loadAd);
+        if (siteId) {
+            loadSpecialFormat(siteId, 'popup');
+            loadSpecialFormat(siteId, 'interstitial');
+        }
     }
 
-    /**
-     * Fetches and injects an ad for a single placeholder.
-     * @param {HTMLElement} placeholder - The div element for the ad.
-     */
-    function loadAd(placeholder) {
-        const siteId = placeholder.dataset.siteId;
-        const type = placeholder.dataset.type || 'banner'; // Default to banner if not specified
-
-        if (!siteId) {
-            console.error('Ad Server: Placeholder is missing "data-site-id".', placeholder);
-            return;
-        }
-
-        const adUrl = `${API_BASE_URL}/ad-request?site_id=${siteId}&type=${type}`;
-
-        fetch(adUrl)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Network response was not ok: ${response.statusText}`);
-                }
-                return response.json();
+    function loadSpecialFormat(siteId, type) {
+        fetch(`${API_BASE_URL}/ad-request?site_id=${siteId}&type=${type}`)
+            .then(res => {
+                if (!res.ok) throw new Error(res.statusText);
+                return res.json();
             })
             .then(ad => {
-                if (ad.html_content && ad.placement_id) {
-                    injectAd(placeholder, ad);
+                if (ad.html_content) {
+                    injectSpecialAd(ad, type);
                 }
             })
-            .catch(error => {
-                console.error(`Ad Server: Failed to load ad for Site ${siteId}:`, error);
-                placeholder.style.display = 'none'; // Hide placeholder on failure
+            .catch(() => {
+                // Silently fail if no special ad is returned
             });
     }
 
-    /**
-     * Creates an iframe and injects the ad content, then sets up visibility tracking.
-     * @param {HTMLElement} placeholder - The div element for the ad.
-     * @param {object} ad - The ad object from the API.
-     */
-    function injectAd(placeholder, ad) {
-        const iframe = document.createElement('iframe');
+    function injectSpecialAd(ad, type) {
+        const container = document.createElement('div');
+        container.style.position = 'fixed';
+        container.style.zIndex = '999999';
+        container.style.top = '0';
+        container.style.left = '0';
+        container.style.width = '100%';
+        container.style.height = '100%';
+        container.style.display = 'flex';
+        container.style.alignItems = 'center';
+        container.style.justifyContent = 'center';
+        container.style.backgroundColor = 'rgba(0,0,0,0.5)'; // Dimmed background
 
-        // Extract style preferences from placeholder
-        const styles = {
-            '--ad-font-family': placeholder.dataset.fontFamily,
-            '--ad-bg-color': placeholder.dataset.bgColor,
-            '--ad-title-color': placeholder.dataset.titleColor,
-            '--ad-desc-color': placeholder.dataset.descColor,
+        const iframe = document.createElement('iframe');
+        iframe.style.border = 'none';
+        iframe.style.overflow = 'hidden';
+
+        if (type === 'popup') {
+            iframe.style.width = '300px';
+            iframe.style.height = '250px';
+            iframe.style.boxShadow = '0 0 20px rgba(0,0,0,0.5)';
+            iframe.style.borderRadius = '10px';
+        } else if (type === 'interstitial') {
+            iframe.style.width = '100%';
+            iframe.style.height = '100%';
+        }
+
+        // Inject content
+        iframe.srcdoc = ad.html_content + '<style>body{margin:0;display:flex;align-items:center;justify-content:center;height:100%;}</style>';
+
+        // Close button
+        const closeBtn = document.createElement('button');
+        closeBtn.innerText = '×';
+        closeBtn.style.position = 'absolute';
+        closeBtn.style.top = '10px';
+        closeBtn.style.right = '10px';
+        closeBtn.style.background = '#fff';
+        closeBtn.style.border = 'none';
+        closeBtn.style.borderRadius = '50%';
+        closeBtn.style.width = '30px';
+        closeBtn.style.height = '30px';
+        closeBtn.style.cursor = 'pointer';
+        closeBtn.style.fontSize = '20px';
+        closeBtn.style.fontWeight = 'bold';
+        closeBtn.style.zIndex = '1000000';
+
+        if (type === 'popup') {
+            // For popup, put close button relative to the container or just absolute on screen?
+            // Let's put it on the container for simplicity, but positioned relative to the iframe would be better.
+            // For now, top right of screen is easiest to implement reliably.
+        }
+
+        closeBtn.onclick = () => {
+            document.body.removeChild(container);
         };
 
-        // Build CSS variables string
+        container.appendChild(iframe);
+        container.appendChild(closeBtn);
+        document.body.appendChild(container);
+
+        setupVisibilityObserver(iframe, ad.placement_id);
+    }
+
+    function loadAd(placeholder) {
+        const siteId = placeholder.dataset.siteId;
+        const type = placeholder.dataset.type || 'wide'; // Default to wide
+
+        if (!siteId) {
+            console.error('Tudex Ads: Placeholder missing "data-site-id".');
+            return;
+        }
+
+        // Request the ad
+        fetch(`${API_BASE_URL}/ad-request?site_id=${siteId}&type=${type}`)
+            .then(res => {
+                if (!res.ok) throw new Error(res.statusText);
+                return res.json();
+            })
+            .then(ad => {
+                if (ad.html_content) {
+                    injectAd(placeholder, ad, type);
+                }
+            })
+            .catch(err => {
+                console.error('Tudex Ads: Failed to load ad.', err);
+                placeholder.style.display = 'none';
+            });
+    }
+
+    function injectAd(placeholder, ad, type) {
+        const iframe = document.createElement('iframe');
+
+        // Define Standard Sizes
+        let width, height;
+
+        switch (type) {
+            case 'tall': // Alto (Vertical)
+                width = '160px'; // Standard Skyscraper width
+                height = '600px';
+                break;
+            case 'square': // Cuadrado (MREC)
+                width = '300px';
+                height = '250px';
+                break;
+            case 'wide': // Ancho (Banner)
+            default:
+                width = '100%'; // Responsive width
+                height = '90px'; // Standard Leaderboard height
+                break;
+        }
+
+        // Override if manual width/height provided
+        if (placeholder.dataset.width) width = placeholder.dataset.width + 'px';
+        if (placeholder.dataset.height) height = placeholder.dataset.height + 'px';
+
+        // CSS Variables for the Creative to adapt
+        const styles = {
+            '--ad-width': width,
+            '--ad-height': height,
+            '--ad-type': type
+        };
+
         let styleInjection = '<style>:root {';
         for (const [key, value] of Object.entries(styles)) {
-            if (value) {
-                styleInjection += `${key}: ${value} !important;`;
-            }
+            styleInjection += `${key}: ${value} !important;`;
         }
-        styleInjection += '}</style>';
+        styleInjection += '} body { margin: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }</style>';
 
-        // Inject styles into the HTML content
-        // We prepend it to ensure it overrides defaults but allows the template to use variables
         let finalHtml = ad.html_content;
         if (finalHtml.includes('<head>')) {
             finalHtml = finalHtml.replace('<head>', `<head>${styleInjection}`);
@@ -92,102 +182,48 @@
         }
 
         iframe.srcdoc = finalHtml;
-
-        // Determine width and height. If the ad zone provided explicit dimensions use them,
-        // otherwise compute based on the placeholder's available width and use a sensible
-        // default aspect ratio for height.
-        let widthPx;
-        if (placeholder.dataset.width) {
-            widthPx = parseInt(placeholder.dataset.width, 10);
-        } else {
-            // Try the placeholder's current width or its parent container's width
-            const rect = placeholder.getBoundingClientRect();
-            widthPx = rect && rect.width ? Math.round(rect.width) : (placeholder.parentElement ? placeholder.parentElement.clientWidth : window.innerWidth);
-        }
-
-        let heightPx;
-        if (placeholder.dataset.height) {
-            heightPx = parseInt(placeholder.dataset.height, 10);
-        } else {
-            // Default to a 4:1 width:height ratio (e.g., 300x75) but clamp to reasonable bounds
-            heightPx = Math.max(90, Math.min(600, Math.round(widthPx / 4)));
-        }
-
-        // Apply computed dimensions to the iframe
-        iframe.style.width = (isNaN(widthPx) ? '100%' : (widthPx + 'px'));
-        iframe.style.height = (isNaN(heightPx) ? '100%' : (heightPx + 'px'));
+        iframe.style.width = width;
+        iframe.style.height = height;
         iframe.style.border = 'none';
         iframe.style.overflow = 'hidden';
-        iframe.style.backgroundColor = 'transparent'; // Ensure transparency
+        iframe.style.backgroundColor = 'transparent';
 
-        // Clear the placeholder and append the iframe
+        // Handle responsive wide banners (max-width constraint)
+        if (type === 'wide') {
+            iframe.style.maxWidth = '100%';
+            iframe.style.minWidth = '300px';
+        }
+
         placeholder.innerHTML = '';
         placeholder.appendChild(iframe);
 
-        // Set up the Intersection Observer to track viewability
         setupVisibilityObserver(iframe, ad.placement_id);
     }
 
-    /**
-     * Sets up an Intersection Observer to track when the ad is visible.
-     * @param {HTMLIFrameElement} iframe - The ad iframe.
-     * @param {string} placementId - The unique ID for this specific ad placement.
-     */
     function setupVisibilityObserver(iframe, placementId) {
-        const observer = new IntersectionObserver((entries, observer) => {
+        const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    // Start a timer when the ad becomes visible
-                    const visibilityTimer = setTimeout(() => {
-                        // If the ad is still visible after the required time, record the impression
-                        if (entry.intersectionRatio >= VIEWABILITY_THRESHOLD) {
-                            recordImpression(placementId);
-                            // Stop observing to prevent duplicate impression records
-                            observer.unobserve(iframe);
-                        }
-                    }, VIEWABILITY_TIME);
-
-                    // Store the timer on the iframe so we can clear it if it becomes hidden
-                    iframe.dataset.visibilityTimer = visibilityTimer;
-                } else {
-                    // If the ad is no longer intersecting, clear any pending timer
-                    if (iframe.dataset.visibilityTimer) {
-                        clearTimeout(iframe.dataset.visibilityTimer);
-                    }
+                if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+                    setTimeout(() => {
+                        recordImpression(placementId);
+                        observer.unobserve(iframe);
+                    }, 1000);
                 }
             });
-        }, { threshold: VIEWABILITY_THRESHOLD });
-
+        }, { threshold: 0.5 });
         observer.observe(iframe);
     }
 
-    /**
-     * Sends a request to the server to record a valid ad impression.
-     * @param {string} placementId - The unique placement ID.
-     */
     function recordImpression(placementId) {
-        // This is where we will send the telemetry data in Phase 2.
-        // For now, it just hits the impression endpoint.
-        const impressionUrl = `${API_BASE_URL}/impression/${placementId}`;
-        const telemetryData = {
-            page_url: window.location.href,
-            timestamp: new Date().toISOString(),
-            viewport_width: window.innerWidth,
-            viewport_height: window.innerHeight,
-        };
-
-        // Use sendBeacon for reliable background sending
-        const blob = new Blob([JSON.stringify(telemetryData)], { type: 'application/json; charset=UTF-8' });
-        navigator.sendBeacon(impressionUrl, blob);
-
-        console.log(`Ad Server: Impression recorded for placement ${placementId}.`);
+        const url = `${API_BASE_URL}/impression/${placementId}`;
+        const data = { page_url: window.location.href, timestamp: new Date().toISOString() };
+        const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+        navigator.sendBeacon(url, blob);
     }
 
-    // Run the script once the DOM is fully loaded.
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
         init();
     }
-
 })();
