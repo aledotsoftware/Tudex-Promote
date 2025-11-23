@@ -9,13 +9,14 @@
 (function () {
     const API_BASE_URL = 'http://127.0.0.1:8000/api';
 
+    // Track if a special ad is already showing to prevent overlaps
+    let specialAdShowing = false;
+
     function init() {
         const placeholders = document.querySelectorAll('.ad-server-placeholder');
         placeholders.forEach(loadAd);
 
         // Automatically try to load special formats if site ID is available
-        // We can get site ID from the first placeholder if available, or it should be passed in script tag
-        // For now, let's check if we can find a site ID
         let siteId = null;
         const scriptTag = document.currentScript || document.querySelector('script[data-site-id]');
         if (scriptTag) {
@@ -25,19 +26,27 @@
         }
 
         if (siteId) {
-            loadSpecialFormat(siteId, 'popup');
-            loadSpecialFormat(siteId, 'interstitial');
+            // Only try to load ONE special format, with a delay
+            // Random choice between popup and interstitial, or just popup for now
+            setTimeout(() => {
+                loadSpecialFormat(siteId, 'popup');
+            }, 3000); // Wait 3 seconds after page load before showing popup
         }
     }
 
     function loadSpecialFormat(siteId, type) {
+        // Don't load if already showing a special ad
+        if (specialAdShowing) {
+            return;
+        }
+
         fetch(`${API_BASE_URL}/ad-request?site_id=${siteId}&type=${type}`)
             .then(res => {
                 if (!res.ok) throw new Error(res.statusText);
                 return res.json();
             })
             .then(ad => {
-                if (ad.html_content) {
+                if (ad.html_content && !specialAdShowing) {
                     injectSpecialAd(ad, type);
                 }
             })
@@ -47,7 +56,11 @@
     }
 
     function injectSpecialAd(ad, type) {
+        // Mark that we're showing a special ad
+        specialAdShowing = true;
+
         const container = document.createElement('div');
+        container.className = 'tudex-special-ad-overlay';
         container.style.position = 'fixed';
         container.style.zIndex = '999999';
         container.style.top = '0';
@@ -57,20 +70,35 @@
         container.style.display = 'flex';
         container.style.alignItems = 'center';
         container.style.justifyContent = 'center';
-        container.style.backgroundColor = 'rgba(0,0,0,0.5)'; // Dimmed background
+        container.style.backgroundColor = 'rgba(0, 0, 0, 0.75)';
+        container.style.backdropFilter = 'blur(4px)';
+        container.style.opacity = '0';
+        container.style.transition = 'opacity 0.3s ease';
+
+        // Content wrapper for better positioning
+        const contentWrapper = document.createElement('div');
+        contentWrapper.style.position = 'relative';
+        contentWrapper.style.display = 'flex';
+        contentWrapper.style.alignItems = 'center';
+        contentWrapper.style.justifyContent = 'center';
 
         const iframe = document.createElement('iframe');
         iframe.style.border = 'none';
         iframe.style.overflow = 'hidden';
+        iframe.style.backgroundColor = '#ffffff';
 
         if (type === 'popup') {
             iframe.style.width = '300px';
             iframe.style.height = '250px';
-            iframe.style.boxShadow = '0 0 20px rgba(0,0,0,0.5)';
-            iframe.style.borderRadius = '10px';
+            iframe.style.boxShadow = '0 10px 40px rgba(0, 0, 0, 0.5)';
+            iframe.style.borderRadius = '12px';
         } else if (type === 'interstitial') {
-            iframe.style.width = '100%';
-            iframe.style.height = '100%';
+            iframe.style.width = '90%';
+            iframe.style.height = '90%';
+            iframe.style.maxWidth = '800px';
+            iframe.style.maxHeight = '600px';
+            iframe.style.boxShadow = '0 10px 40px rgba(0, 0, 0, 0.5)';
+            iframe.style.borderRadius = '12px';
         }
 
         // Inject content
@@ -78,33 +106,61 @@
 
         // Close button
         const closeBtn = document.createElement('button');
-        closeBtn.innerText = '×';
+        closeBtn.innerHTML = '×';
+        closeBtn.setAttribute('aria-label', 'Close ad');
         closeBtn.style.position = 'absolute';
-        closeBtn.style.top = '10px';
-        closeBtn.style.right = '10px';
-        closeBtn.style.background = '#fff';
+        closeBtn.style.top = '-15px';
+        closeBtn.style.right = '-15px';
+        closeBtn.style.background = '#ffffff';
         closeBtn.style.border = 'none';
         closeBtn.style.borderRadius = '50%';
-        closeBtn.style.width = '30px';
-        closeBtn.style.height = '30px';
+        closeBtn.style.width = '40px';
+        closeBtn.style.height = '40px';
         closeBtn.style.cursor = 'pointer';
-        closeBtn.style.fontSize = '20px';
+        closeBtn.style.fontSize = '28px';
         closeBtn.style.fontWeight = 'bold';
-        closeBtn.style.zIndex = '1000000';
+        closeBtn.style.lineHeight = '1';
+        closeBtn.style.color = '#333';
+        closeBtn.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.3)';
+        closeBtn.style.transition = 'all 0.2s ease';
+        closeBtn.style.zIndex = '1000001';
 
-        if (type === 'popup') {
-            // For popup, put close button relative to the container or just absolute on screen?
-            // Let's put it on the container for simplicity, but positioned relative to the iframe would be better.
-            // For now, top right of screen is easiest to implement reliably.
-        }
-
-        closeBtn.onclick = () => {
-            document.body.removeChild(container);
+        closeBtn.onmouseover = () => {
+            closeBtn.style.transform = 'scale(1.1)';
+            closeBtn.style.background = '#f0f0f0';
         };
 
-        container.appendChild(iframe);
-        container.appendChild(closeBtn);
+        closeBtn.onmouseout = () => {
+            closeBtn.style.transform = 'scale(1)';
+            closeBtn.style.background = '#ffffff';
+        };
+
+        closeBtn.onclick = () => {
+            container.style.opacity = '0';
+            setTimeout(() => {
+                if (document.body.contains(container)) {
+                    document.body.removeChild(container);
+                }
+                specialAdShowing = false;
+            }, 300);
+        };
+
+        // Also allow clicking the overlay background to close
+        container.onclick = (e) => {
+            if (e.target === container) {
+                closeBtn.click();
+            }
+        };
+
+        contentWrapper.appendChild(iframe);
+        contentWrapper.appendChild(closeBtn);
+        container.appendChild(contentWrapper);
         document.body.appendChild(container);
+
+        // Fade in animation
+        setTimeout(() => {
+            container.style.opacity = '1';
+        }, 10);
 
         setupVisibilityObserver(iframe, ad.placement_id);
     }

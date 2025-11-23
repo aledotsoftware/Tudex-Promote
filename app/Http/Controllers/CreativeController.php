@@ -46,20 +46,43 @@ class CreativeController extends Controller
             'description' => ['required', 'string', 'max:255'],
             'click_url' => ['required', 'url'],
             'type' => ['required', 'string', 'in:wide,tall,square,popup,interstitial'],
+            'bg_color' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'title_color' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'text_color' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'button_color' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'border_color' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
         ]);
 
-        // Generate HTML content from title and description
-        $htmlContent = view('creatives.templates.default', [
-            'title' => $request->title,
-            'description' => $request->description,
-            'click_url' => $request->click_url,
-        ])->render();
+        // Load template and normalize line endings
+        $templatePath = resource_path('views/creatives/templates/default.php');
+        $template = file_get_contents($templatePath);
+        $template = str_replace("\r\n", "\n", $template); // Normalize Windows line endings
+        
+        // Prepare variables for replacement
+        $variables = [
+            '{{TITLE}}' => htmlspecialchars($request->title),
+            '{{DESCRIPTION}}' => htmlspecialchars($request->description),
+            '{{CLICK_URL}}' => htmlspecialchars($request->click_url),
+            '{{BG_COLOR}}' => $request->bg_color ?? '#ffffff',
+            '{{TITLE_COLOR}}' => $request->title_color ?? '#0f172a',
+            '{{TEXT_COLOR}}' => $request->text_color ?? '#64748b',
+            '{{BUTTON_COLOR}}' => $request->button_color ?? '#3b82f6',
+            '{{BORDER_COLOR}}' => $request->border_color ?? '#e2e8f0',
+            '{{DOMAIN}}' => parse_url($request->click_url, PHP_URL_HOST) ?? 'promoted',
+        ];
+        
+        $htmlContent = str_replace(array_keys($variables), array_values($variables), $template);
 
         Creative::create([
             'campaign_id' => $request->campaign_id,
             'html_content' => $htmlContent,
             'click_url' => $request->click_url,
             'type' => $request->type,
+            'bg_color' => $request->bg_color ?? '#ffffff',
+            'title_color' => $request->title_color ?? '#0f172a',
+            'text_color' => $request->text_color ?? '#64748b',
+            'button_color' => $request->button_color ?? '#3b82f6',
+            'border_color' => $request->border_color ?? '#e2e8f0',
         ]);
 
         return redirect()->route('creatives.index')->with('success', 'Creative added successfully.');

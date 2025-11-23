@@ -57,6 +57,75 @@
                             <x-input-error :messages="$errors->get('type')" class="mt-2" />
                         </div>
 
+                        <!-- Color Customization Section -->
+                        <div class="mt-6 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">{{ __('Color Customization') }}</h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Background Color -->
+                                <div>
+                                    <x-input-label for="bg_color" :value="__('Background Color')" />
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <input type="color" id="bg_color" name="bg_color" value="{{ old('bg_color', '#ffffff') }}" class="h-10 w-20 rounded border-gray-300 dark:border-gray-700 cursor-pointer">
+                                        <input type="text" id="bg_color_text" value="{{ old('bg_color', '#ffffff') }}" class="block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" readonly>
+                                    </div>
+                                    <x-input-error :messages="$errors->get('bg_color')" class="mt-2" />
+                                </div>
+
+                                <!-- Title Color -->
+                                <div>
+                                    <x-input-label for="title_color" :value="__('Title Color')" />
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <input type="color" id="title_color" name="title_color" value="{{ old('title_color', '#0f172a') }}" class="h-10 w-20 rounded border-gray-300 dark:border-gray-700 cursor-pointer">
+                                        <input type="text" id="title_color_text" value="{{ old('title_color', '#0f172a') }}" class="block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" readonly>
+                                    </div>
+                                    <x-input-error :messages="$errors->get('title_color')" class="mt-2" />
+                                </div>
+
+                                <!-- Text/Description Color -->
+                                <div>
+                                    <x-input-label for="text_color" :value="__('Description Color')" />
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <input type="color" id="text_color" name="text_color" value="{{ old('text_color', '#64748b') }}" class="h-10 w-20 rounded border-gray-300 dark:border-gray-700 cursor-pointer">
+                                        <input type="text" id="text_color_text" value="{{ old('text_color', '#64748b') }}" class="block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" readonly>
+                                    </div>
+                                    <x-input-error :messages="$errors->get('text_color')" class="mt-2" />
+                                </div>
+
+                                <!-- Button Color -->
+                                <div>
+                                    <x-input-label for="button_color" :value="__('Button Color')" />
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <input type="color" id="button_color" name="button_color" value="{{ old('button_color', '#3b82f6') }}" class="h-10 w-20 rounded border-gray-300 dark:border-gray-700 cursor-pointer">
+                                        <input type="text" id="button_color_text" value="{{ old('button_color', '#3b82f6') }}" class="block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" readonly>
+                                    </div>
+                                    <x-input-error :messages="$errors->get('button_color')" class="mt-2" />
+                                </div>
+
+                                <!-- Border Color -->
+                                <div>
+                                    <x-input-label for="border_color" :value="__('Border Color')" />
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <input type="color" id="border_color" name="border_color" value="{{ old('border_color', '#e2e8f0') }}" class="h-10 w-20 rounded border-gray-300 dark:border-gray-700 cursor-pointer">
+                                        <input type="text" id="border_color_text" value="{{ old('border_color', '#e2e8f0') }}" class="block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm" readonly>
+                                    </div>
+                                    <x-input-error :messages="$errors->get('border_color')" class="mt-2" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <script>
+                            // Sync color pickers with text inputs
+                            ['bg_color', 'title_color', 'text_color', 'button_color', 'border_color'].forEach(field => {
+                                const colorInput = document.getElementById(field);
+                                const textInput = document.getElementById(field + '_text');
+                                
+                                colorInput.addEventListener('input', (e) => {
+                                    textInput.value = e.target.value;
+                                });
+                            });
+                        </script>
+
 
                         <div class="flex items-center justify-end mt-4">
                             <x-primary-button>

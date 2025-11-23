@@ -21,6 +21,11 @@ class Creative extends Model
         'click_url',
         'type',
         'is_active',
+        'bg_color',
+        'title_color',
+        'text_color',
+        'button_color',
+        'border_color',
     ];
 
     public function campaign()
