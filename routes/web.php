@@ -19,9 +19,19 @@ Route::get('/api/impression/{placement}', [ApiController::class, 'impression'])-
 Route::get('/api/click/{placement}', [ApiController::class, 'click'])->name('api.click');
 
 
+
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::post('/locale-switch', function (Illuminate\Http\Request $request) {
+    $locale = $request->input('locale');
+    if (in_array($locale, ['en', 'es'])) {
+        session(['locale' => $locale]);
+    }
+    return back();
+})->name('locale.switch');
+
 
 Route::get('/dashboard', function () {
     if (auth()->user()->role === 'publisher') {
@@ -46,6 +56,8 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('creatives', CreativeController::class)->middleware('role:advertiser');
     Route::post('creatives/{creative}/toggle-status', [CreativeController::class, 'toggleStatus'])->name('creatives.toggle-status')->middleware('role:advertiser');
+    Route::post('creatives/{creative}/duplicate', [CreativeController::class, 'duplicate'])->name('creatives.duplicate')->middleware('role:advertiser');
+    Route::get('creatives-export', [CreativeController::class, 'export'])->name('creatives.export')->middleware('role:advertiser');
     Route::resource('campaigns', CampaignController::class)->middleware('role:advertiser');
     Route::post('campaigns/{campaign}/toggle-status', [CampaignController::class, 'toggleStatus'])->name('campaigns.toggle-status')->middleware('role:advertiser');
     Route::get('campaigns/{campaign}/stats', [CampaignController::class, 'stats'])->name('campaigns.stats')->middleware('role:advertiser');

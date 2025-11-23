@@ -117,4 +117,126 @@ class CreativeController extends Controller
         $status = $creative->is_active ? 'activated' : 'paused';
         return redirect()->route('creatives.index')->with('success', "Creative {$status} successfully.");
     }
+
+    /**
+     * Duplicate a creative
+     */
+    public function duplicate(Creative $creative)
+    {
+        $this->authorize('view', $creative);
+
+        $newCreative = $creative->replicate();
+        $newCreative->is_active = false; // Start as paused
+        $newCreative->impressions = 0;
+        $newCreative->clicks = 0;
+        $newCreative->save();
+
+        return redirect()->route('creatives.index')->with('success', 'Creative duplicated successfully. The new creative is paused.');
+    }
+
+    /**
+     * Update creative (for inline editing)
+     */
+    public function update(Request $request, Creative $creative)
+    {
+        $this->authorize('update', $creative);
+
+        $request->validate([
+            'title' => ['sometimes', 'string', 'max:255'],
+            'description' => ['sometimes', 'string', 'max:255'],
+            'click_url' => ['sometimes', 'url'],
+            'type' => ['sometimes', 'string', 'in:wide,tall,square,popup,interstitial'],
+        ]);
+
+        // If we're updating content fields, regenerate HTML
+        if ($request->has(['title', 'description', 'click_url'])) {
+            $templatePath = resource_path('views/creatives/templates/default.php');
+            $template = file_get_contents($templatePath);
+            $template = str_replace("\r\n", "\n", $template);
+            
+            $variables = [
+                '{{TITLE}}' => htmlspecialchars($request->title ?? $creative->title),
+                '{{DESCRIPTION}}' => htmlspecialchars($request->description ?? $creative->description),
+                '{{CLICK_URL}}' => htmlspecialchars($request->click_url ?? $creative->click_url),
+                '{{BG_COLOR}}' => $creative->bg_color ?? '#ffffff',
+                '{{TITLE_COLOR}}' => $creative->title_color ?? '#0f172a',
+                '{{TEXT_COLOR}}' => $creative->text_color ?? '#64748b',
+                '{{BUTTON_COLOR}}' => $creative->button_color ?? '#3b82f6',
+                '{{BORDER_COLOR}}' => $creative->border_color ?? '#e2e8f0',
+                '{{DOMAIN}}' => parse_url($request->click_url ?? $creative->click_url, PHP_URL_HOST) ?? 'promoted',
+            ];
+            
+            $htmlContent = str_replace(array_keys($variables), array_values($variables), $template);
+            $creative->html_content = $htmlContent;
+        }
+
+        $creative->fill($request->only(['click_url', 'type']));
+        $creative->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Creative updated successfully.',
+            'creative' => $creative
+        ]);
+    }
+
+    /**
+     * Export creatives data to CSV
+     */
+    public function export()
+    {
+        $creatives = Creative::whereIn('campaign_id', auth()->user()->campaigns->pluck('id'))
+            ->with('campaign')
+            ->get();
+
+        $filename = 'creatives_export_' . date('Y-m-d_His') . '.csv';
+        
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function() use ($creatives) {
+            $file = fopen('php://output', 'w');
+            
+            // Headers
+            fputcsv($file, [
+                'ID',
+                'Campaign',
+                'Type',
+                'Status',
+                'Click URL',
+                'Impressions',
+                'Clicks',
+                'CTR (%)',
+                'Created At',
+                'Last Updated'
+            ]);
+
+            // Data
+            foreach ($creatives as $creative) {
+                $ctr = $creative->impressions > 0 
+                    ? number_format(($creative->clicks / $creative->impressions) * 100, 2) 
+                    : '0.00';
+
+                fputcsv($file, [
+                    $creative->id,
+                    $creative->campaign->name ?? 'N/A',
+                    ucfirst($creative->type),
+                    $creative->is_active ? 'Active' : 'Paused',
+                    $creative->click_url,
+                    $creative->impressions,
+                    $creative->clicks,
+                    $ctr,
+                    $creative->created_at->format('Y-m-d H:i:s'),
+                    $creative->updated_at->format('Y-m-d H:i:s'),
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }
+
