@@ -29,10 +29,16 @@ class ApiController extends Controller
 
         // Choose creatives. We allow ANY type to be served, assuming the creative is responsive.
         // We prioritize active campaigns and active creatives.
+        // We only support HTML ads (either inline HTML or .html files) to avoid binary/image issues.
         $creative = \App\Models\Creative::whereHas('campaign', function ($q) {
                 $q->where('is_active', true);
             })
             ->where('is_active', true)
+            ->where(function ($query) {
+                $query->whereNotNull('html_content')
+                      ->where('html_content', '!=', '')
+                      ->orWhere('file_url', 'LIKE', '%.html');
+            })
             ->inRandomOrder()
             ->first();
 
