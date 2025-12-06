@@ -32,13 +32,13 @@
             flex-direction: column;
             width: 100%;
             height: 100%;
-            padding: 16px;
+            padding: 20px;
             background: {{BG_COLOR}};
             text-decoration: none;
             border: 1px solid {{BORDER_COLOR}};
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: all 0.3s ease;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
         }
@@ -56,8 +56,9 @@
         }
 
         .tudex-ad:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-4px) scale(1.005);
+            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.12);
+            border-color: {{BUTTON_COLOR}};
         }
 
         .tudex-ad:hover::before {
@@ -67,25 +68,28 @@
         .tudex-ad-header {
             display: flex;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             font-size: 11px;
             letter-spacing: 0.5px;
+            opacity: 0.9;
         }
 
         .tudex-ad-badge {
-            background-color: {{BORDER_COLOR}};
-            color: {{TEXT_COLOR}};
-            border-radius: 4px;
-            padding: 2px 6px;
-            margin-right: 8px;
-            font-weight: 600;
+            background-color: {{BUTTON_COLOR}}15;
+            color: {{BUTTON_COLOR}};
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin-right: 10px;
+            font-weight: 700;
             text-transform: uppercase;
-            font-size: 10px;
+            font-size: 9px;
+            letter-spacing: 0.5px;
         }
 
         .tudex-ad-domain {
             color: {{TEXT_COLOR}};
             font-weight: 500;
+            opacity: 0.8;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -100,74 +104,116 @@
 
         .tudex-ad-main {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 12px;
-        }
-
-        .tudex-ad-text {
-            flex: 1;
-            min-width: 0;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .tudex-ad-title {
-            font-size: 16px;
-            font-weight: 700;
+            font-size: 18px;
+            font-weight: 800;
             color: {{TITLE_COLOR}};
-            margin: 0 0 6px 0;
-            line-height: 1.3;
+            margin: 0;
+            line-height: 1.25;
+            letter-spacing: -0.02em;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            transition: color 0.3s ease;
+        }
+
+        .tudex-ad:hover .tudex-ad-title {
+            color: {{BUTTON_COLOR}};
         }
 
         .tudex-ad-description {
-            font-size: 13px;
+            font-size: 14px;
             color: {{TEXT_COLOR}};
-            margin: 0;
+            margin: 4px 0 0 0;
             line-height: 1.5;
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            opacity: 0.9;
         }
 
         .tudex-ad-cta {
-            margin-top: 12px;
+            margin-top: 16px;
             display: flex;
             justify-content: flex-end;
+            align-items: center;
         }
 
         .tudex-ad-button {
-            background: linear-gradient(135deg, {{BUTTON_COLOR}}, {{BUTTON_COLOR}}cc);
+            background: {{BUTTON_COLOR}};
             color: #fff;
-            padding: 8px 20px;
-            border-radius: 9999px;
+            padding: 10px 24px;
+            border-radius: 12px;
             font-size: 13px;
             font-weight: 600;
             white-space: nowrap;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 4px {{BUTTON_COLOR}}4d;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px {{BUTTON_COLOR}}40;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tudex-ad-button::after {
+            content: '→';
+            font-size: 14px;
+            transition: transform 0.3s ease;
         }
 
         .tudex-ad:hover .tudex-ad-button {
-            transform: scale(1.05);
-            box-shadow: 0 4px 6px {{BUTTON_COLOR}}66;
+            padding-right: 28px;
+            box-shadow: 0 6px 16px {{BUTTON_COLOR}}60;
+            transform: translateY(-1px);
         }
 
-        /* Responsive adjustments */
-        @media (max-height: 90px) {
+        .tudex-ad:hover .tudex-ad-button::after {
+            transform: translateX(4px);
+        }
+
+        /* Shine effect */
+        .tudex-ad::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(
+                to right,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transform: skewX(-25deg);
+            transition: 0.5s;
+            pointer-events: none;
+        }
+
+        .tudex-ad:hover::after {
+            animation: shine 0.75s;
+        }
+
+        @keyframes shine {
+            100% { left: 125%; }
+        }
+
+        /* Responsive */
+        @media (max-height: 120px) {
             .tudex-ad {
                 flex-direction: row;
+                padding: 12px;
                 align-items: center;
-                padding: 8px 12px;
             }
             
             .tudex-ad-header {
+                margin: 0 16px 0 0;
                 margin-bottom: 0;
-                margin-right: 12px;
-                flex-shrink: 0;
             }
 
             .tudex-ad-content {
@@ -178,8 +224,8 @@
 
             .tudex-ad-main {
                 flex: 1;
-                align-items: center;
                 margin-right: 12px;
+                gap: 4px;
             }
 
             .tudex-ad-description {
@@ -187,40 +233,40 @@
             }
 
             .tudex-ad-title {
-                font-size: 14px;
-                margin: 0;
+                font-size: 15px;
                 -webkit-line-clamp: 1;
+                margin-bottom: 0;
             }
 
             .tudex-ad-cta {
-                margin-top: 0;
-                flex-shrink: 0;
+                margin: 0;
             }
 
             .tudex-ad-button {
-                padding: 6px 16px;
+                padding: 8px 16px;
                 font-size: 12px;
             }
-            
-            .tudex-ad::before {
-                height: 100%;
-                width: 4px;
+
+            .tudex-ad-button::after {
+                display: none;
+            }
+
+            .tudex-ad:hover .tudex-ad-button {
+                padding-right: 16px;
             }
         }
     </style>
 </head>
 <body>
-    <a href="%%CLICK_URL%%" target="_blank" class="tudex-ad">
+    <a href="{{CLICK_URL}}" target="_blank" class="tudex-ad">
         <div class="tudex-ad-header">
             <span class="tudex-ad-badge">Ad</span>
             <span class="tudex-ad-domain">{{DOMAIN}}</span>
         </div>
         <div class="tudex-ad-content">
             <div class="tudex-ad-main">
-                <div class="tudex-ad-text">
-                    <h1 class="tudex-ad-title">{{TITLE}}</h1>
-                    <p class="tudex-ad-description">{{DESCRIPTION}}</p>
-                </div>
+                <h1 class="tudex-ad-title">{{TITLE}}</h1>
+                <p class="tudex-ad-description">{{DESCRIPTION}}</p>
             </div>
             <div class="tudex-ad-cta">
                 <span class="tudex-ad-button">Open</span>
