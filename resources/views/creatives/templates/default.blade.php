@@ -8,11 +8,11 @@
     $textColor = $text_color ?? '#64748b';
     $buttonColor = $button_color ?? '#3b82f6';
     $borderColor = $border_color ?? '#e2e8f0';
+    $clickUrl = $click_url ?? '#';
     
     // Generate button gradient colors
-    $buttonColorDark = $buttonColor . 'cc';
-    $buttonShadowLight = $buttonColor . '4d';
-    $buttonShadowDark = $buttonColor . '66';
+    // Not needed in CSS-only version if we use simpler hex manipulation or CSS vars, but we can keep PHP logic if needed.
+    // However, to match default.php exactly, we will try to use the same CSS logic.
 @endphp
 <!DOCTYPE html>
 <html lang="en">
@@ -24,8 +24,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Reset and base styles */
-        #{{ $adId }} * {
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -49,16 +48,15 @@
             flex-direction: column;
             width: 100%;
             height: 100%;
-            padding: 16px;
+            padding: 20px;
             background: {{ $bgColor }};
             text-decoration: none;
             border: 1px solid {{ $borderColor }};
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: all 0.3s ease;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
         }
 
         #{{ $adId }}::before {
@@ -68,181 +66,226 @@
             left: 0;
             width: 100%;
             height: 4px;
-            background: linear-gradient(90deg, {{ $buttonColor }}, {{ $buttonColorDark }});
+            background: linear-gradient(90deg, {{ $buttonColor }}, {{ $buttonColor }}cc);
             opacity: 0;
             transition: opacity 0.3s ease;
         }
 
         #{{ $adId }}:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            border-color: {{ $borderColor }};
+            transform: translateY(-4px) scale(1.005);
+            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.12);
+            border-color: {{ $buttonColor }};
         }
 
         #{{ $adId }}:hover::before {
             opacity: 1;
         }
 
-        #{{ $adId }} .ad-header-{{ $adId }} {
+        #{{ $adId }} .tudex-ad-header {
             display: flex;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
             font-size: 11px;
+            letter-spacing: 0.5px;
+            opacity: 0.9;
+        }
+
+        #{{ $adId }} .tudex-ad-badge {
+            background-color: {{ $buttonColor }}15;
+            color: {{ $buttonColor }};
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin-right: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 9px;
             letter-spacing: 0.5px;
         }
 
-        #{{ $adId }} .ad-badge-{{ $adId }} {
-            background-color: {{ $borderColor }};
-            color: {{ $textColor }};
-            border-radius: 4px;
-            padding: 2px 6px;
-            margin-right: 8px;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 10px;
-        }
-
-        #{{ $adId }} .ad-domain-{{ $adId }} {
+        #{{ $adId }} .tudex-ad-domain {
             color: {{ $textColor }};
             font-weight: 500;
+            opacity: 0.8;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        #{{ $adId }} .ad-content-{{ $adId }} {
+        #{{ $adId }} .tudex-ad-content {
             display: flex;
             flex-direction: column;
             flex: 1;
             justify-content: space-between;
         }
 
-        #{{ $adId }} .ad-main-{{ $adId }} {
+        #{{ $adId }} .tudex-ad-main {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 12px;
+            flex-direction: column;
+            gap: 8px;
         }
 
-        #{{ $adId }} .ad-text-{{ $adId }} {
-            flex: 1;
-            min-width: 0;
-        }
-
-        #{{ $adId }} .ad-title-{{ $adId }} {
-            font-size: 16px;
-            font-weight: 700;
+        #{{ $adId }} .tudex-ad-title {
+            font-size: 18px;
+            font-weight: 800;
             color: {{ $titleColor }};
-            margin: 0 0 6px 0;
-            line-height: 1.3;
+            margin: 0;
+            line-height: 1.25;
+            letter-spacing: -0.02em;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            transition: color 0.3s ease;
         }
 
-        #{{ $adId }} .ad-description-{{ $adId }} {
-            font-size: 13px;
+        #{{ $adId }}:hover .tudex-ad-title {
+            color: {{ $buttonColor }};
+        }
+
+        #{{ $adId }} .tudex-ad-description {
+            font-size: 14px;
             color: {{ $textColor }};
-            margin: 0;
+            margin: 4px 0 0 0;
             line-height: 1.5;
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            opacity: 0.9;
         }
 
-        #{{ $adId }} .ad-cta-{{ $adId }} {
-            margin-top: 12px;
+        #{{ $adId }} .tudex-ad-cta {
+            margin-top: 16px;
             display: flex;
             justify-content: flex-end;
+            align-items: center;
         }
 
-        #{{ $adId }} .cta-button-{{ $adId }} {
-            background: linear-gradient(135deg, {{ $buttonColor }}, {{ $buttonColorDark }});
+        #{{ $adId }} .tudex-ad-button {
+            background: {{ $buttonColor }};
             color: #fff;
-            padding: 8px 20px;
-            border-radius: 9999px;
+            padding: 10px 24px;
+            border-radius: 12px;
             font-size: 13px;
             font-weight: 600;
             white-space: nowrap;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 4px {{ $buttonShadowLight }};
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px {{ $buttonColor }}40;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        #{{ $adId }}:hover .cta-button-{{ $adId }} {
-            transform: scale(1.05);
-            box-shadow: 0 4px 6px {{ $buttonShadowDark }};
+        #{{ $adId }} .tudex-ad-button::after {
+            content: '→';
+            font-size: 14px;
+            transition: transform 0.3s ease;
         }
 
-        /* Responsive adjustments */
-        @media (max-height: 90px) {
+        #{{ $adId }}:hover .tudex-ad-button {
+            padding-right: 28px;
+            box-shadow: 0 6px 16px {{ $buttonColor }}60;
+            transform: translateY(-1px);
+        }
+
+        #{{ $adId }}:hover .tudex-ad-button::after {
+            transform: translateX(4px);
+        }
+
+        /* Shine effect */
+        #{{ $adId }}::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(
+                to right,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent
+            );
+            transform: skewX(-25deg);
+            transition: 0.5s;
+            pointer-events: none;
+        }
+
+        #{{ $adId }}:hover::after {
+            animation: shine-{{ $adId }} 0.75s;
+        }
+
+        @keyframes shine-{{ $adId }} {
+            100% { left: 125%; }
+        }
+
+        /* Responsive */
+        @media (max-height: 120px) {
             #{{ $adId }} {
                 flex-direction: row;
+                padding: 12px;
                 align-items: center;
-                padding: 8px 12px;
             }
             
-            #{{ $adId }} .ad-header-{{ $adId }} {
+            #{{ $adId }} .tudex-ad-header {
+                margin: 0 16px 0 0;
                 margin-bottom: 0;
-                margin-right: 12px;
-                flex-shrink: 0;
             }
 
-            #{{ $adId }} .ad-content-{{ $adId }} {
+            #{{ $adId }} .tudex-ad-content {
                 flex-direction: row;
                 align-items: center;
                 width: 100%;
             }
 
-            #{{ $adId }} .ad-main-{{ $adId }} {
+            #{{ $adId }} .tudex-ad-main {
                 flex: 1;
-                align-items: center;
                 margin-right: 12px;
+                gap: 4px;
             }
 
-            #{{ $adId }} .ad-description-{{ $adId }} {
+            #{{ $adId }} .tudex-ad-description {
                 display: none;
             }
 
-            #{{ $adId }} .ad-title-{{ $adId }} {
-                font-size: 14px;
-                margin: 0;
+            #{{ $adId }} .tudex-ad-title {
+                font-size: 15px;
                 -webkit-line-clamp: 1;
+                margin-bottom: 0;
             }
 
-            #{{ $adId }} .ad-cta-{{ $adId }} {
-                margin-top: 0;
-                flex-shrink: 0;
+            #{{ $adId }} .tudex-ad-cta {
+                margin: 0;
             }
 
-            #{{ $adId }} .cta-button-{{ $adId }} {
-                padding: 6px 16px;
+            #{{ $adId }} .tudex-ad-button {
+                padding: 8px 16px;
                 font-size: 12px;
             }
-            
-            #{{ $adId }}::before {
-                height: 100%;
-                width: 4px;
+
+            #{{ $adId }} .tudex-ad-button::after {
+                display: none;
+            }
+
+            #{{ $adId }}:hover .tudex-ad-button {
+                padding-right: 16px;
             }
         }
     </style>
 </head>
 <body>
-    <a href="%%CLICK_URL%%" target="_blank" id="{{ $adId }}">
-        <div class="ad-header-{{ $adId }}">
-            <span class="ad-badge-{{ $adId }}">Ad</span>
-            <span class="ad-domain-{{ $adId }}">{{ parse_url($click_url, PHP_URL_HOST) ?? 'promoted' }}</span>
+    <a href="{{ $clickUrl }}" target="_blank" id="{{ $adId }}">
+        <div class="tudex-ad-header">
+            <span class="tudex-ad-badge">Ad</span>
+            <span class="tudex-ad-domain">{{ parse_url($clickUrl, PHP_URL_HOST) ?? 'promoted' }}</span>
         </div>
-        <div class="ad-content-{{ $adId }}">
-            <div class="ad-main-{{ $adId }}">
-                <div class="ad-text-{{ $adId }}">
-                    <h1 class="ad-title-{{ $adId }}">{{ $title }}</h1>
-                    <p class="ad-description-{{ $adId }}">{{ $description }}</p>
-                </div>
+        <div class="tudex-ad-content">
+            <div class="tudex-ad-main">
+                <h1 class="tudex-ad-title">{{ $title }}</h1>
+                <p class="tudex-ad-description">{{ $description }}</p>
             </div>
-            <div class="ad-cta-{{ $adId }}">
-                <span class="cta-button-{{ $adId }}">Open</span>
+            <div class="tudex-ad-cta">
+                <span class="tudex-ad-button">Open</span>
             </div>
         </div>
     </a>
