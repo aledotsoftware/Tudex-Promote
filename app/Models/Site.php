@@ -15,6 +15,7 @@ class Site extends Model
      * @var array
      */
     protected $fillable = [
+        'user_id',
         'domain',
         'verification_token',
         'verified',
