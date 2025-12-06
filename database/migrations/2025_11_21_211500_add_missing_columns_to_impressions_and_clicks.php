@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::table('ad_impressions', function (Blueprint $table) {
             $table->foreignId('placement_id')->nullable()->constrained()->onDelete('cascade');
-            $table->timestamp('impression_time')->nullable();
         });
 
         Schema::table('ad_clicks', function (Blueprint $table) {
@@ -29,7 +28,7 @@ return new class extends Migration
     {
         Schema::table('ad_impressions', function (Blueprint $table) {
             $table->dropForeign(['placement_id']);
-            $table->dropColumn(['placement_id', 'impression_time']);
+            $table->dropColumn(['placement_id']);
         });
 
         Schema::table('ad_clicks', function (Blueprint $table) {

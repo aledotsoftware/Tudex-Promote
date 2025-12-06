@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('creative_id')->constrained()->onDelete('cascade');
             $table->foreignId('site_id')->constrained()->onDelete('cascade');
             $table->foreignId('ad_zone_id')->constrained()->onDelete('cascade');
+            $table->timestamp('impression_time')->nullable();
             $table->string('ip_hash');
             $table->timestamps();
         });

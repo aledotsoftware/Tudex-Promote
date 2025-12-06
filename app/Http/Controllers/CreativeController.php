@@ -9,13 +9,12 @@ use Illuminate\Http\Request;
 class CreativeController extends Controller
 {
     use AuthorizesRequests;
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        // For simplicity, we'll assume the advertiser has campaigns and we'll fetch creatives through them.
-        // This will need to be more robust later.
         $creatives = Creative::whereIn('campaign_id', auth()->user()->campaigns->pluck('id'))->get();
 
         return view('creatives.index', compact('creatives'));
@@ -42,10 +41,11 @@ class CreativeController extends Controller
     {
         $request->validate([
             'campaign_id' => ['required', 'exists:campaigns,id'],
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string', 'max:255'],
+            'title' => ['required', 'string', 'max:100'],
+            'description' => ['required', 'string', 'max:300'],
+            'button_text' => ['nullable', 'string', 'max:30'],
+            'image_url' => ['nullable', 'url'],
             'click_url' => ['required', 'url'],
-            'type' => ['required', 'string', 'in:wide,tall,square,popup,interstitial'],
             'bg_color' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'title_color' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'text_color' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
@@ -53,31 +53,13 @@ class CreativeController extends Controller
             'border_color' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
         ]);
 
-        // Load template and normalize line endings
-        $templatePath = resource_path('views/creatives/templates/default.php');
-        $template = file_get_contents($templatePath);
-        $template = str_replace("\r\n", "\n", $template); // Normalize Windows line endings
-        
-        // Prepare variables for replacement
-        $variables = [
-            '{{TITLE}}' => htmlspecialchars($request->title),
-            '{{DESCRIPTION}}' => htmlspecialchars($request->description),
-            '{{CLICK_URL}}' => htmlspecialchars($request->click_url),
-            '{{BG_COLOR}}' => $request->bg_color ?? '#ffffff',
-            '{{TITLE_COLOR}}' => $request->title_color ?? '#0f172a',
-            '{{TEXT_COLOR}}' => $request->text_color ?? '#64748b',
-            '{{BUTTON_COLOR}}' => $request->button_color ?? '#3b82f6',
-            '{{BORDER_COLOR}}' => $request->border_color ?? '#e2e8f0',
-            '{{DOMAIN}}' => parse_url($request->click_url, PHP_URL_HOST) ?? 'promoted',
-        ];
-        
-        $htmlContent = str_replace(array_keys($variables), array_values($variables), $template);
-
         Creative::create([
             'campaign_id' => $request->campaign_id,
-            'html_content' => $htmlContent,
+            'title' => $request->title,
+            'description' => $request->description,
+            'button_text' => $request->button_text ?? 'Learn More',
+            'image_url' => $request->image_url,
             'click_url' => $request->click_url,
-            'type' => $request->type,
             'bg_color' => $request->bg_color ?? '#ffffff',
             'title_color' => $request->title_color ?? '#0f172a',
             'text_color' => $request->text_color ?? '#64748b',
@@ -127,8 +109,6 @@ class CreativeController extends Controller
 
         $newCreative = $creative->replicate();
         $newCreative->is_active = false; // Start as paused
-        $newCreative->impressions = 0;
-        $newCreative->clicks = 0;
         $newCreative->save();
 
         return redirect()->route('creatives.index')->with('success', 'Creative duplicated successfully. The new creative is paused.');
@@ -142,35 +122,22 @@ class CreativeController extends Controller
         $this->authorize('update', $creative);
 
         $request->validate([
-            'title' => ['sometimes', 'string', 'max:255'],
-            'description' => ['sometimes', 'string', 'max:255'],
+            'title' => ['sometimes', 'string', 'max:100'],
+            'description' => ['sometimes', 'string', 'max:300'],
+            'button_text' => ['sometimes', 'string', 'max:30'],
+            'image_url' => ['sometimes', 'nullable', 'url'],
             'click_url' => ['sometimes', 'url'],
-            'type' => ['sometimes', 'string', 'in:wide,tall,square,popup,interstitial'],
+            'bg_color' => ['sometimes', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'title_color' => ['sometimes', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'text_color' => ['sometimes', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'button_color' => ['sometimes', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'border_color' => ['sometimes', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
         ]);
 
-        // If we're updating content fields, regenerate HTML
-        if ($request->has(['title', 'description', 'click_url'])) {
-            $templatePath = resource_path('views/creatives/templates/default.php');
-            $template = file_get_contents($templatePath);
-            $template = str_replace("\r\n", "\n", $template);
-            
-            $variables = [
-                '{{TITLE}}' => htmlspecialchars($request->title ?? $creative->title),
-                '{{DESCRIPTION}}' => htmlspecialchars($request->description ?? $creative->description),
-                '{{CLICK_URL}}' => htmlspecialchars($request->click_url ?? $creative->click_url),
-                '{{BG_COLOR}}' => $creative->bg_color ?? '#ffffff',
-                '{{TITLE_COLOR}}' => $creative->title_color ?? '#0f172a',
-                '{{TEXT_COLOR}}' => $creative->text_color ?? '#64748b',
-                '{{BUTTON_COLOR}}' => $creative->button_color ?? '#3b82f6',
-                '{{BORDER_COLOR}}' => $creative->border_color ?? '#e2e8f0',
-                '{{DOMAIN}}' => parse_url($request->click_url ?? $creative->click_url, PHP_URL_HOST) ?? 'promoted',
-            ];
-            
-            $htmlContent = str_replace(array_keys($variables), array_values($variables), $template);
-            $creative->html_content = $htmlContent;
-        }
-
-        $creative->fill($request->only(['click_url', 'type']));
+        $creative->fill($request->only([
+            'title', 'description', 'button_text', 'image_url', 'click_url',
+            'bg_color', 'title_color', 'text_color', 'button_color', 'border_color'
+        ]));
         $creative->save();
 
         return response()->json([
@@ -203,31 +170,25 @@ class CreativeController extends Controller
             fputcsv($file, [
                 'ID',
                 'Campaign',
-                'Type',
+                'Title',
+                'Description',
+                'Button Text',
                 'Status',
                 'Click URL',
-                'Impressions',
-                'Clicks',
-                'CTR (%)',
                 'Created At',
                 'Last Updated'
             ]);
 
             // Data
             foreach ($creatives as $creative) {
-                $ctr = $creative->impressions > 0 
-                    ? number_format(($creative->clicks / $creative->impressions) * 100, 2) 
-                    : '0.00';
-
                 fputcsv($file, [
                     $creative->id,
                     $creative->campaign->name ?? 'N/A',
-                    ucfirst($creative->type),
+                    $creative->title,
+                    $creative->description,
+                    $creative->button_text,
                     $creative->is_active ? 'Active' : 'Paused',
                     $creative->click_url,
-                    $creative->impressions,
-                    $creative->clicks,
-                    $ctr,
                     $creative->created_at->format('Y-m-d H:i:s'),
                     $creative->updated_at->format('Y-m-d H:i:s'),
                 ]);
@@ -238,5 +199,20 @@ class CreativeController extends Controller
 
         return response()->stream($callback, 200, $headers);
     }
-}
 
+    /**
+     * Preview creative in different formats
+     */
+    public function preview(Creative $creative, Request $request)
+    {
+        $this->authorize('view', $creative);
+        
+        $format = $request->get('format', 'wide');
+        $html = $creative->generateHtml($format);
+        
+        return response()->json([
+            'html' => $html,
+            'format' => $format
+        ]);
+    }
+}

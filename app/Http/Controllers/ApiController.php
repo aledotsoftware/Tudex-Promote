@@ -17,28 +17,17 @@ class ApiController extends Controller
     {
         $request->validate([
             'site_id' => 'required|exists:sites,id',
-            'type' => 'nullable|string',
+            'format' => 'nullable|string|in:wide,tall,square,popup,native',
         ]);
 
         $siteId = $request->input('site_id');
-        $type = $request->input('type', 'banner');
+        $format = $request->input('format', $request->input('type', 'wide')); // Support both 'format' and 'type' params
 
-        // Verify site is active/verified (optional, but good practice)
-        // $site = \App\Models\Site::find($siteId);
-        // if (!$site->verified) ...
-
-        // Choose creatives. We allow ANY type to be served, assuming the creative is responsive.
-        // We prioritize active campaigns and active creatives.
-        // We only support HTML ads (either inline HTML or .html files) to avoid binary/image issues.
+        // Choose a random active creative from active campaigns
         $creative = \App\Models\Creative::whereHas('campaign', function ($q) {
                 $q->where('is_active', true);
             })
             ->where('is_active', true)
-            ->where(function ($query) {
-                $query->whereNotNull('html_content')
-                      ->where('html_content', '!=', '')
-                      ->orWhere('file_url', 'LIKE', '%.html');
-            })
             ->inRandomOrder()
             ->first();
 
@@ -46,48 +35,21 @@ class ApiController extends Controller
             return response()->json(['error' => 'No creatives available'], 404);
         }
 
-        // Create a placement record.
+        // Create a placement record
         $placement = Placement::create([
             'creative_id' => $creative->id,
-            'ad_zone_id' => null, // No longer using Ad Zones
+            'ad_zone_id' => null,
             'site_id' => $siteId,
         ]);
 
-        if ($creative->html_content) {
-            $htmlContent = $creative->html_content;
-        } else {
-            // Ensure the creative has a valid file in storage
-            $disk = Storage::disk('public');
-            if (! $disk->exists($creative->file_url)) {
-                return response()->json(['error' => 'Creative file not found'], 404);
-            }
-            $htmlContent = $disk->get($creative->file_url);
-        }
-
-        // Inject Campaign Styles
-        $campaign = $creative->campaign;
-        if ($campaign) {
-            $styles = "<style>:root {";
-            if ($campaign->title_color) $styles .= "--ad-title-color: {$campaign->title_color};";
-            if ($campaign->description_color) $styles .= "--ad-desc-color: {$campaign->description_color};";
-            if ($campaign->accent_color) $styles .= "--ad-accent-color: {$campaign->accent_color};";
-            if ($campaign->font_family) $styles .= "--ad-font-family: {$campaign->font_family};";
-            $styles .= "}</style>";
-            
-            // Prepend to HTML
-            if (str_contains($htmlContent, '<head>')) {
-                $htmlContent = str_replace('<head>', '<head>' . $styles, $htmlContent);
-            } else {
-                $htmlContent = $styles . $htmlContent;
-            }
-        }
-
+        // Generate HTML dynamically based on the requested format
         $clickUrl = route('api.click', $placement);
-        $htmlContent = str_replace('%%CLICK_URL%%', $clickUrl, $htmlContent);
+        $htmlContent = $creative->generateHtml($format, $clickUrl);
 
         return response()->json([
             'html_content' => $htmlContent,
             'placement_id' => $placement->id,
+            'format' => $format,
         ])->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
           ->header('Pragma', 'no-cache')
           ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
