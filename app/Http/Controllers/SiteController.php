@@ -47,6 +47,24 @@ class SiteController extends Controller
      */
     public function store(Request $request)
     {
+        // Clean domain (remove protocol and path) before validation
+        $domain = $request->domain;
+        $parsed = parse_url($domain);
+
+        if ($parsed === false) {
+             // If parsing fails completely, keep original (validation will likely fail or it will just be stored as is)
+        } elseif (isset($parsed['host'])) {
+            $domain = $parsed['host'];
+        } else {
+             // Fallback for when parse_url might not detect host if scheme is missing (e.g. example.com/path)
+             // parse_url('example.com') returns ['path' => 'example.com']
+             $domain = $parsed['path'] ?? $domain;
+             // Remove any trailing path slash or segments if user entered example.com/foo
+             $domain = explode('/', $domain)[0];
+        }
+
+        $request->merge(['domain' => $domain]);
+
         $request->validate([
             'domain' => ['required', 'string', 'unique:sites,domain', 'max:255'],
         ]);
