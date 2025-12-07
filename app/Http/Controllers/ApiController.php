@@ -23,15 +23,21 @@ class ApiController extends Controller
         $siteId = $request->input('site_id');
         $type = $request->input('type', 'banner');
 
-        // Verify site is active/verified (optional, but good practice)
-        // $site = \App\Models\Site::find($siteId);
-        // if (!$site->verified) ...
-
-        // Choose creatives. We allow ANY type to be served, assuming the creative is responsive.
+        // Choose creatives.
         // We prioritize active campaigns and active creatives.
         // We only support HTML ads (either inline HTML or .html files) to avoid binary/image issues.
         $creative = \App\Models\Creative::whereHas('campaign', function ($q) {
-                $q->where('is_active', true);
+                $now = now();
+                $q->where('is_active', true)
+                  ->where('budget', '>', 0)
+                  ->where(function($query) use ($now) {
+                      $query->whereNull('start_at')
+                            ->orWhere('start_at', '<=', $now);
+                  })
+                  ->where(function($query) use ($now) {
+                      $query->whereNull('end_at')
+                            ->orWhere('end_at', '>=', $now);
+                  });
             })
             ->where('is_active', true)
             ->where(function ($query) {
@@ -49,7 +55,7 @@ class ApiController extends Controller
         // Create a placement record.
         $placement = Placement::create([
             'creative_id' => $creative->id,
-            'ad_zone_id' => null, // No longer using Ad Zones
+            'ad_zone_id' => null, // No longer using Ad Zones for ID targeting, but we could link it if we wanted to
             'site_id' => $siteId,
         ]);
 
@@ -95,6 +101,27 @@ class ApiController extends Controller
 
     public function impression(Request $request, Placement $placement)
     {
+        $metadata = $request->except(['page_url']);
+
+        // Basic User Agent Parsing
+        $ua = $request->userAgent();
+        $device = 'desktop';
+        if (preg_match('/(tablet|ipad|playbook)|(android(?!.*(mobi|opera mini)))/i', $ua)) {
+            $device = 'tablet';
+        } elseif (preg_match('/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|phone|android|iemobile)/i', $ua)) {
+            $device = 'mobile';
+        }
+        $metadata['device_type'] = $device;
+
+        // OS Detection
+        $os = 'unknown';
+        if (preg_match('/windows nt/i', $ua)) $os = 'windows';
+        elseif (preg_match('/mac os x/i', $ua)) $os = 'macos';
+        elseif (preg_match('/android/i', $ua)) $os = 'android';
+        elseif (preg_match('/linux/i', $ua)) $os = 'linux';
+        elseif (preg_match('/iphone|ipad|ipod/i', $ua)) $os = 'ios';
+        $metadata['os'] = $os;
+
         AdImpression::create([
             'placement_id' => $placement->id,
             'creative_id' => $placement->creative_id,
@@ -103,8 +130,8 @@ class ApiController extends Controller
             'ip_hash' => hash('sha256', $request->ip()),
             'impression_time' => now(),
             'page_url' => $request->input('page_url'),
-            'user_agent' => $request->userAgent(),
-            'metadata' => $request->except(['page_url']),
+            'user_agent' => $ua,
+            'metadata' => json_encode($metadata), // Ensure it is stored as JSON if the column is JSON type, or let Laravel cast it if configured.
         ]);
 
         return response()->json(['success' => true]);
